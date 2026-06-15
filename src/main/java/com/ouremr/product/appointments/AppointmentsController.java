@@ -1,8 +1,6 @@
 package com.ouremr.product.appointments;
 
-import com.ouremr.product.dto.AppointmentDTO;
-import com.ouremr.product.dto.AppointmentPatientDetailDTO;
-import com.ouremr.product.dto.AppointmentStatusCountsDTO;
+import com.ouremr.product.dto.*;
 import com.ouremr.product.emrbean.EMRResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +16,11 @@ public class AppointmentsController {
     AppointmentsService appointmentservice;
 
     @GetMapping("/getAppointmentStatusCounts")
-    public EMRResponseBean getAppointmentStatusCounts(@RequestParam(value = "userId") Long userId) {
+    public EMRResponseBean getAppointmentStatusCounts(@RequestParam(value = "userId") Long userId, @RequestParam(value = "apptDate") String apptDate) {
         EMRResponseBean response = new EMRResponseBean();
 
         try {
-            AppointmentStatusCountsDTO data = appointmentservice.getAppointmentStatusCounts(userId);
+            AppointmentStatusCountsDTO data = appointmentservice.getAppointmentStatusCounts(userId, apptDate);
             response.setData(data);
         } catch (Exception e) {
             response.setData("ERROR_FETCHING_SUMMARY");
@@ -32,11 +30,11 @@ public class AppointmentsController {
     }
 
     @GetMapping("/getAppointments")
-    public EMRResponseBean getAppointments(@RequestParam(value = "userId") Integer userId) {
+    public EMRResponseBean getAppointments(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "apptDate") String apptDate, @RequestParam(value = "pageNo") Integer pageNo) {
         EMRResponseBean response = new EMRResponseBean();
 
         try {
-            List<AppointmentDTO> data = appointmentservice.getAppointments(userId);
+            List<AppointmentDTO> data = appointmentservice.getAppointments(userId, apptDate, pageNo);
             response.setData(data);
         } catch (Exception e) {
             response.setData("ERROR_FETCHING_APPOINTMENTS");
@@ -52,6 +50,34 @@ public class AppointmentsController {
 
         try {
             AppointmentPatientDetailDTO data = appointmentservice.getAppointmentPatientDetail(appointmentId);
+            response.setData(data);
+        } catch (Exception e) {
+            response.setData("ERROR_FETCHING_APPOINTMENTS");
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @PostMapping("/createAppointments")
+    public EMRResponseBean createAppointments(@RequestBody CreateAppointmentDTO bean) {
+        EMRResponseBean response = new EMRResponseBean();
+
+        try {
+            response.setData(appointmentservice.createAppointments(bean));
+        } catch (Exception e) {
+            response.setData("ERROR_FETCHING_APPOINTMENTS");
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @GetMapping("/getCreateApptDetails")
+    public EMRResponseBean getCreateApptDetails() {
+        EMRResponseBean response = new EMRResponseBean();
+        try {
+            CreateAppointmentBasicInfo data = appointmentservice.getCreateApptDetails();
             response.setData(data);
         } catch (Exception e) {
             response.setData("ERROR_FETCHING_APPOINTMENTS");

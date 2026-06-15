@@ -1,16 +1,18 @@
 package com.ouremr.product.appointments;
 
-import com.ouremr.product.dto.AppointmentDTO;
-import com.ouremr.product.dto.AppointmentPatientDetailDTO;
-import com.ouremr.product.dto.AppointmentStatusCountsDTO;
+import com.ouremr.product.dto.*;
 
 import java.util.List;
 
 public interface AppointmentsService {
 
-    AppointmentStatusCountsDTO getAppointmentStatusCounts(Long userId);
+    AppointmentStatusCountsDTO getAppointmentStatusCounts(Long userId, String apptDate);
 
-    List<AppointmentDTO> getAppointments(Integer userId);
+    List<AppointmentDTO> getAppointments(Integer userId, String apptDate, Integer pageNo);
 
     AppointmentPatientDetailDTO getAppointmentPatientDetail(Long appointmentId);
+
+    Boolean createAppointments(CreateAppointmentDTO bean);
+
+    CreateAppointmentBasicInfo getCreateApptDetails();
 }

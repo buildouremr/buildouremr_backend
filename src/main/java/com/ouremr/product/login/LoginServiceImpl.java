@@ -18,13 +18,13 @@ public class LoginServiceImpl implements LoginService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public String authenticateUser(String userName, String password) {
+    public String authenticateUser(String userEmail, String password) {
 
-        if (!HUtil.isValidString(userName) || !HUtil.isValidString(password)) {
+        if (!HUtil.isValidString(userEmail) || !HUtil.isValidString(password)) {
             return "INVALID_INPUT";
         }
 
-        UserLogin user = userLoginRepository.findByUserName(userName);
+        UserLogin user = userLoginRepository.findByUserEmail(userEmail);
 
         System.out.println("user :: "+user);
         if (user == null) {
@@ -42,8 +42,8 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public UserLogin getUser(String userName) {
-        return userLoginRepository.findByUserName(userName);
+    public UserLogin getUser(String userEmail) {
+        return userLoginRepository.findByUserEmail(userEmail);
     }
 
     @Override

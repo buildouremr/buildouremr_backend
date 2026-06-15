@@ -18,11 +18,11 @@ public class DashboardController {
     DashboardService dashboardService;
 
     @GetMapping("/getSummary")
-    public EMRResponseBean getSummary(@RequestParam(value = "userId") Long userId) {
+    public EMRResponseBean getSummary(@RequestParam(value = "userId") Long userId, @RequestParam(value = "apptDate") String apptDate) {
         EMRResponseBean response = new EMRResponseBean();
 
         try {
-            AppointmentStatusCountsDTO data = dashboardService.getDashboardSummary(userId);
+            AppointmentStatusCountsDTO data = dashboardService.getDashboardSummary(userId, apptDate);
             response.setData(data);
         } catch (Exception e) {
             response.setData("ERROR_FETCHING_SUMMARY");
@@ -32,11 +32,11 @@ public class DashboardController {
     }
 
     @GetMapping("/getAppointments")
-    public EMRResponseBean getAppointments(@RequestParam(value = "userId") Integer userId) {
+    public EMRResponseBean getAppointments(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "apptDate") String apptDate, @RequestParam(value = "pageNo") Integer pageNo) {
         EMRResponseBean response = new EMRResponseBean();
 
         try {
-            List<AppointmentDTO> data = dashboardService.getAppointments(userId);
+            List<AppointmentDTO> data = dashboardService.getAppointments(userId, apptDate, pageNo);
             response.setData(data);
         } catch (Exception e) {
             response.setData("ERROR_FETCHING_APPOINTMENTS");

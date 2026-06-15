@@ -1,6 +1,8 @@
 package com.ouremr.product.tables;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -13,13 +15,13 @@ public class SchedulerAppointment {
     private Long schedulerAppointmentId;
 
     @Column(name = "scheduler_appointment_patientid")
-    private String schedulerAppointmentPatientId;
+    private Long schedulerAppointmentPatientId;
 
     @Column(name = "scheduler_appointment_patientname")
     private String schedulerAppointmentPatientName;
 
     @Column(name = "scheduler_appointment_appt_date")
-    private OffsetDateTime schedulerAppointmentAppointmentDate;
+    private LocalDate schedulerAppointmentAppointmentDate;
 
     @Column(name = "scheduler_appointment_reason")
     private String schedulerAppointmentReason;
@@ -53,11 +55,27 @@ public class SchedulerAppointment {
         this.schedulerAppointmentId = schedulerAppointmentId;
     }
 
-    public String getSchedulerAppointmentPatientId() {
+    public Long getSchedulerAppointmentPatientId() {
         return schedulerAppointmentPatientId;
     }
 
-    public void setSchedulerAppointmentPatientId(String schedulerAppointmentPatientId) {
+    public String getSchedulerAppointmentStartTime() {
+        return schedulerAppointmentStartTime;
+    }
+
+    public void setSchedulerAppointmentStartTime(String schedulerAppointmentStartTime) {
+        this.schedulerAppointmentStartTime = schedulerAppointmentStartTime;
+    }
+
+    public String getSchedulerAppointmentEndTime() {
+        return schedulerAppointmentEndTime;
+    }
+
+    public void setSchedulerAppointmentEndTime(String schedulerAppointmentEndTime) {
+        this.schedulerAppointmentEndTime = schedulerAppointmentEndTime;
+    }
+
+    public void setSchedulerAppointmentPatientId(Long schedulerAppointmentPatientId) {
         this.schedulerAppointmentPatientId = schedulerAppointmentPatientId;
     }
 
@@ -69,11 +87,11 @@ public class SchedulerAppointment {
         this.schedulerAppointmentPatientName = schedulerAppointmentPatientName;
     }
 
-    public OffsetDateTime getSchedulerAppointmentAppointmentDate() {
+    public LocalDate getSchedulerAppointmentAppointmentDate() {
         return schedulerAppointmentAppointmentDate;
     }
 
-    public void setSchedulerAppointmentAppointmentDate(OffsetDateTime schedulerAppointmentAppointmentDate) {
+    public void setSchedulerAppointmentAppointmentDate(LocalDate schedulerAppointmentAppointmentDate) {
         this.schedulerAppointmentAppointmentDate = schedulerAppointmentAppointmentDate;
     }
 

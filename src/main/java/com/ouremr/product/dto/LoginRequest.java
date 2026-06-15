@@ -2,17 +2,17 @@ package com.ouremr.product.dto;
 
 public class LoginRequest {
 
-    private String userName;
+    private String userEmail;
     private String password;
 
     private String OTP;
 
-    public String getUserName() {
-        return userName;
+    public String getUserEmail() {
+        return userEmail;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userEmail = userEmail;
     }
 
     public String getPassword() {

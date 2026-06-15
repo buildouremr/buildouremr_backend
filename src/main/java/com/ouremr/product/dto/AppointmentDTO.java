@@ -1,15 +1,17 @@
 package com.ouremr.product.dto;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public class AppointmentDTO {
 
     private Long patientId;
+    private Long apptId;
     private String patientName;
     private String providerName;
     private String status;
     private String type;
-    private OffsetDateTime appointmentDate;
+    private LocalDate appointmentDate;
     private String reason;
     private String patientType;
     private String startTime;
@@ -21,6 +23,14 @@ public class AppointmentDTO {
 
     public void setPatientId(Long patientId) {
         this.patientId = patientId;
+    }
+
+    public Long getApptId() {
+        return apptId;
+    }
+
+    public void setApptId(Long apptId) {
+        this.apptId = apptId;
     }
 
     public String getPatientName() {
@@ -55,11 +65,11 @@ public class AppointmentDTO {
         this.type = type;
     }
 
-    public OffsetDateTime getAppointmentDate() {
+    public LocalDate getAppointmentDate() {
         return appointmentDate;
     }
 
-    public void setAppointmentDate(OffsetDateTime appointmentDate) {
+    public void setAppointmentDate(LocalDate appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 

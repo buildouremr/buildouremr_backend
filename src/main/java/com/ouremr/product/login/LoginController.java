@@ -35,9 +35,9 @@ public class LoginController {
     @PostMapping("/login")
     public EMRResponseBean login(@RequestBody LoginRequest request) {
         EMRResponseBean response = new EMRResponseBean();
-        String result = loginService.authenticateUser(request.getUserName(), request.getPassword());
+        String result = loginService.authenticateUser(request.getUserEmail(), request.getPassword());
         if ("SUCCESS".equals(result)) {
-            String token = jwtUtil.generateToken(request.getUserName());
+            String token = jwtUtil.generateToken(request.getUserEmail());
             response.setData(token);
         } else {
             response.setData("INVALID_CREDENTIALS");
@@ -48,7 +48,7 @@ public class LoginController {
     @PostMapping("/forgot-password/send-otp")
     public EMRResponseBean sendOtp(@RequestBody LoginRequest request) {
         EMRResponseBean response = new EMRResponseBean();
-        otpService.generateOtp(request.getUserName());
+        otpService.generateOtp(request.getUserEmail());
         response.setData("OTP_SENT");
         return response;
     }
@@ -64,7 +64,7 @@ public class LoginController {
     @PostMapping("/forgot-password/reset")
     public EMRResponseBean resetPassword(@RequestBody LoginRequest request) {
         EMRResponseBean response = new EMRResponseBean();
-        UserLogin user = loginService.getUser(request.getUserName());
+        UserLogin user = loginService.getUser(request.getUserEmail());
         user.setUserPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
         loginService.save(user);
         response.setData("PASSWORD_UPDATED");
@@ -75,7 +75,7 @@ public class LoginController {
     public EMRResponseBean resendOtp(@RequestBody LoginRequest request) {
         EMRResponseBean response = new EMRResponseBean();
         try {
-            otpService.generateOtp(request.getUserName());
+            otpService.generateOtp(request.getUserEmail());
             response.setData("OTP_SENT");
         } catch (Exception e) {
             response.setData("WAIT_30_SECONDS");

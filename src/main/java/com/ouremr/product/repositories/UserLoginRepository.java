@@ -15,5 +15,5 @@ public interface UserLoginRepository extends JpaRepository<UserLogin, Long> {
 
     UserLogin findByUserNameAndUserPassword(String userName, String userPassword);
 
-    UserLogin findByUserName(String userName);
+    UserLogin findByUserEmail(String userEmail);
 }

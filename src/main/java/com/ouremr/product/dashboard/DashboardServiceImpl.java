@@ -25,13 +25,13 @@ public class DashboardServiceImpl implements DashboardService {
     AppointmentsService appointmentsService;
 
     @Override
-    public AppointmentStatusCountsDTO getDashboardSummary(Long userId) {
-        return appointmentsService.getAppointmentStatusCounts(userId);
+    public AppointmentStatusCountsDTO getDashboardSummary(Long userId, String apptDate) {
+        return appointmentsService.getAppointmentStatusCounts(userId, apptDate);
     }
 
     @Override
-    public List<AppointmentDTO> getAppointments(Integer userId) {
-        return appointmentsService.getAppointments(userId);
+    public List<AppointmentDTO> getAppointments(Integer userId, String apptDate, Integer pageNo) {
+        return appointmentsService.getAppointments(userId, apptDate, pageNo);
     }
 
     @Override
