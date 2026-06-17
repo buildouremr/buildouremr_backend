@@ -1,6 +1,9 @@
 package com.ouremr.product.patientregistration;
 
 import com.ouremr.product.dto.ExistingPatientsDTO;
+import com.ouremr.product.dto.PatientDetailsDTO;
+import com.ouremr.product.repositories.PatientRegistrationRepository;
+import com.ouremr.product.tables.EmployeeProfile;
 import com.ouremr.product.tables.PatientRegistration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
@@ -12,6 +15,9 @@ import java.util.List;
 
 @Service
 public class PatientRegistrationServiceImpl implements PatientRegistrationService{
+
+    @Autowired
+    PatientRegistrationRepository patientRegistrationRepository;
 
     @Autowired
     EntityManager em;
@@ -150,6 +156,161 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<PatientDetailsDTO> getAllPatients() {
+
+        List<PatientDetailsDTO> response = new ArrayList<>();
+
+        try {
+
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+
+            Root<PatientRegistration> patient =
+                    cq.from(PatientRegistration.class);
+
+            Root<EmployeeProfile> doctor =
+                    cq.from(EmployeeProfile.class);
+
+            cq.multiselect(
+                    patient,
+                    doctor.get("employeeProfileId"),
+
+                    cb.concat(
+                            cb.concat(
+                                    cb.coalesce(
+                                            doctor.get("employeeProfileFirstName"),
+                                            ""),
+                                    " "
+                            ),
+                            cb.concat(
+                                    cb.coalesce(
+                                            doctor.get("employeeProfileMiddleName"),
+                                            ""),
+                                    cb.concat(
+                                            " ",
+                                            cb.coalesce(
+                                                    doctor.get("employeeProfileLastName"),
+                                                    "")
+                                    )
+                            )
+                    )
+            );
+
+            cq.where(
+                    cb.or(
+                            cb.equal(
+                                    patient.get("patientRegistrationPrincipalDoctor"),
+                                    doctor.get("employeeProfileId")
+                            ),
+                            cb.isNull(
+                                    patient.get("patientRegistrationPrincipalDoctor")
+                            )
+                    )
+            );
+
+            cq.orderBy(
+                    cb.asc(
+                            patient.get("patientRegistrationId")
+                    )
+            );
+
+            List<Object[]> results =
+                    em.createQuery(cq)
+                            .getResultList();
+
+            for (Object[] obj : results) {
+
+                PatientRegistration patientEntity =
+                        (PatientRegistration) obj[0];
+
+                PatientDetailsDTO dto =
+                        new PatientDetailsDTO();
+
+                dto.setPatientRegistrationId(
+                        patientEntity.getPatientRegistrationId());
+
+                dto.setPatientRegistrationFirstName(
+                        patientEntity.getPatientRegistrationFirstName());
+
+                dto.setPatientRegistrationMiddleName(
+                        patientEntity.getPatientRegistrationMiddleName());
+
+                dto.setPatientRegistrationLastName(
+                        patientEntity.getPatientRegistrationLastName());
+
+                dto.setPatientRegistrationGuardianName(
+                        patientEntity.getPatientRegistrationGuardianName());
+
+                dto.setPatientRegistrationDob(
+                        patientEntity.getPatientRegistrationDob());
+
+                dto.setPatientRegistrationSex(
+                        patientEntity.getPatientRegistrationSex());
+
+                dto.setPatientRegistrationAddress(
+                        patientEntity.getPatientRegistrationAddress());
+
+                dto.setPatientRegistrationState(
+                        patientEntity.getPatientRegistrationState());
+
+                dto.setPatientRegistrationCity(
+                        patientEntity.getPatientRegistrationCity());
+
+                dto.setPatientRegistrationPincode(
+                        patientEntity.getPatientRegistrationPincode());
+
+                dto.setPatientRegistrationInsuranceName(
+                        patientEntity.getPatientRegistrationInsuranceName());
+
+                dto.setPatientRegistrationChronic(
+                        patientEntity.getPatientRegistrationChronic());
+
+                dto.setPatientRegistrationCallReminder(
+                        patientEntity.getPatientRegistrationCallReminder());
+
+                dto.setPatientRegistrationTextReminder(
+                        patientEntity.getPatientRegistrationTextReminder());
+
+                dto.setPatientRegistrationMobileNo(
+                        patientEntity.getPatientRegistrationMobileNo());
+
+                dto.setPatientRegistrationOtherMobileNo(
+                        patientEntity.getPatientRegistrationOtherMobileNo());
+
+                dto.setPatientRegistrationImage(
+                        patientEntity.getPatientRegistrationImage());
+
+                dto.setPatientRegistrationBloodGroup(
+                        patientEntity.getPatientRegistrationBloodGroup());
+
+                dto.setPatientRegistrationEmailId(
+                        patientEntity.getPatientRegistrationEmailId());
+
+                dto.setPatientRegistrationActive(
+                        patientEntity.getPatientRegistrationActive());
+
+                dto.setPrincipalDoctorId(
+                        obj[1] != null
+                                ? ((Number) obj[1]).longValue()
+                                : null);
+
+                dto.setPrincipalDoctorName(
+                        obj[2] != null
+                                ? obj[2].toString().trim().replaceAll("\\s+", " ")
+                                : null);
+
+                response.add(dto);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         return response;

@@ -18,27 +18,23 @@ public class LoginServiceImpl implements LoginService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public String authenticateUser(String userEmail, String password) {
+    public UserLogin authenticateUser(String userEmail, String password) {
 
         if (!HUtil.isValidString(userEmail) || !HUtil.isValidString(password)) {
-            return "INVALID_INPUT";
+            return null;
         }
 
         UserLogin user = userLoginRepository.findByUserEmail(userEmail);
 
-        System.out.println("user :: "+user);
         if (user == null) {
-            return "INVALID_CREDENTIALS";
+            return null;
         }
 
-        System.out.println("password :: "+password);
-        System.out.println("user.getUserPassword() :: "+user.getUserPassword());
-        // 🔐 SECURE PASSWORD CHECK
         if (passwordEncoder.matches(password, user.getUserPassword())) {
-            return "SUCCESS";
-        } else {
-            return "INVALID_CREDENTIALS";
+            return user;
         }
+
+        return null;
     }
 
     @Override

@@ -26,4 +26,16 @@ public class PatientRegistrationController {
         return response;
     }
 
+    @GetMapping(value = "/getAllPatients")
+    public EMRResponseBean getAllPatients() {
+        EMRResponseBean response = new EMRResponseBean();
+
+        try {
+            response.setData(patientRegistrationService.getAllPatients());
+        } catch (Exception e) {
+            response.setData("ERROR_FETCHING_SUMMARY");
+        }
+
+        return response;
+    }
 }

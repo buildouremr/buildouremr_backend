@@ -1,6 +1,7 @@
 package com.ouremr.product.login;
 
 import com.ouremr.product.dto.LoginRequest;
+import com.ouremr.product.dto.LoginResponseDTO;
 import com.ouremr.product.dto.OTPVerify;
 import com.ouremr.product.emrbean.EMRResponseBean;
 import com.ouremr.product.otp.OTPService;
@@ -35,12 +36,15 @@ public class LoginController {
     @PostMapping("/login")
     public EMRResponseBean login(@RequestBody LoginRequest request) {
         EMRResponseBean response = new EMRResponseBean();
-        String result = loginService.authenticateUser(request.getUserEmail(), request.getPassword());
-        if ("SUCCESS".equals(result)) {
+        UserLogin user = loginService.authenticateUser(request.getUserEmail(), request.getPassword());
+        if (user != null) {
             String token = jwtUtil.generateToken(request.getUserEmail());
-            response.setData(token);
+            LoginResponseDTO loginResponse = new LoginResponseDTO(user.getUserId(), token);
+            response.setData(loginResponse);
+            response.setStatus("SUCCESS");
         } else {
             response.setData("INVALID_CREDENTIALS");
+            response.setStatus("FAILED");
         }
         return response;
     }

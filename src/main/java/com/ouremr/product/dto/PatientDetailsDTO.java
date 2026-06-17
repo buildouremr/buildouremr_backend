@@ -1,79 +1,35 @@
-package com.ouremr.product.tables;
+package com.ouremr.product.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "patient_registration")
-public class PatientRegistration {
+public class PatientDetailsDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "patient_registration_id")
     private Long patientRegistrationId;
-
-    @Column(name = "patient_registration_firstname")
     private String patientRegistrationFirstName;
-
-    @Column(name = "patient_registration_lastname")
-    private String patientRegistrationLastName;
-
-    @Column(name = "patient_registration_middlename")
     private String patientRegistrationMiddleName;
-
-    @Column(name = "patient_registration_gaurdianname")
+    private String patientRegistrationLastName;
     private String patientRegistrationGuardianName;
-
-    @Column(name = "patient_registration_dob")
-    private LocalDate patientRegistrationDob;
-
-    @Column(name = "patient_registration_sex")
     private String patientRegistrationSex;
-
-    @Column(name = "patient_registration_address")
     private String patientRegistrationAddress;
-
-    @Column(name = "patient_registration_state")
     private String patientRegistrationState;
-
-    @Column(name = "patient_registration_city")
     private String patientRegistrationCity;
-
-    @Column(name = "patient_registration_pincode")
     private String patientRegistrationPincode;
-
-    @Column(name = "patient_registration_insurancename")
     private String patientRegistrationInsuranceName;
-
-    @Column(name = "patient_registration_chronic")
-    private String patientRegistrationChronic;
-
-    @Column(name = "patient_registration_call_reminder")
-    private Boolean patientRegistrationCallReminder;
-
-    @Column(name = "patient_registration_text_reminder")
-    private Boolean patientRegistrationTextReminder;
-
-    @Column(name = "patient_registration_mobile_no")
     private String patientRegistrationMobileNo;
-
-    @Column(name = "patient_registration_other_mobile_no")
     private String patientRegistrationOtherMobileNo;
-
-    @Column(name = "patient_registration_image")
     private String patientRegistrationImage;
-
-    @Column(name = "patient_registration_blood_group")
     private String patientRegistrationBloodGroup;
-
-    @Column(name = "patient_registration_email_id")
     private String patientRegistrationEmailId;
 
-    @Column(name = "patient_registration_active")
+    private LocalDate patientRegistrationDob;
+
+    private String patientRegistrationChronic;
+    private Boolean patientRegistrationCallReminder;
+    private Boolean patientRegistrationTextReminder;
     private Boolean patientRegistrationActive;
 
-    @Column(name = "patient_registration_principal_doctor")
-    private Long patientRegistrationPrincipalDoctor;
+    private Long principalDoctorId;
+    private String principalDoctorName;
 
     public Long getPatientRegistrationId() {
         return patientRegistrationId;
@@ -91,14 +47,6 @@ public class PatientRegistration {
         this.patientRegistrationFirstName = patientRegistrationFirstName;
     }
 
-    public String getPatientRegistrationLastName() {
-        return patientRegistrationLastName;
-    }
-
-    public void setPatientRegistrationLastName(String patientRegistrationLastName) {
-        this.patientRegistrationLastName = patientRegistrationLastName;
-    }
-
     public String getPatientRegistrationMiddleName() {
         return patientRegistrationMiddleName;
     }
@@ -107,20 +55,20 @@ public class PatientRegistration {
         this.patientRegistrationMiddleName = patientRegistrationMiddleName;
     }
 
+    public String getPatientRegistrationLastName() {
+        return patientRegistrationLastName;
+    }
+
+    public void setPatientRegistrationLastName(String patientRegistrationLastName) {
+        this.patientRegistrationLastName = patientRegistrationLastName;
+    }
+
     public String getPatientRegistrationGuardianName() {
         return patientRegistrationGuardianName;
     }
 
     public void setPatientRegistrationGuardianName(String patientRegistrationGuardianName) {
         this.patientRegistrationGuardianName = patientRegistrationGuardianName;
-    }
-
-    public LocalDate getPatientRegistrationDob() {
-        return patientRegistrationDob;
-    }
-
-    public void setPatientRegistrationDob(LocalDate patientRegistrationDob) {
-        this.patientRegistrationDob = patientRegistrationDob;
     }
 
     public String getPatientRegistrationSex() {
@@ -171,30 +119,6 @@ public class PatientRegistration {
         this.patientRegistrationInsuranceName = patientRegistrationInsuranceName;
     }
 
-    public String getPatientRegistrationChronic() {
-        return patientRegistrationChronic;
-    }
-
-    public void setPatientRegistrationChronic(String patientRegistrationChronic) {
-        this.patientRegistrationChronic = patientRegistrationChronic;
-    }
-
-    public Boolean getPatientRegistrationCallReminder() {
-        return patientRegistrationCallReminder;
-    }
-
-    public void setPatientRegistrationCallReminder(Boolean patientRegistrationCallReminder) {
-        this.patientRegistrationCallReminder = patientRegistrationCallReminder;
-    }
-
-    public Boolean getPatientRegistrationTextReminder() {
-        return patientRegistrationTextReminder;
-    }
-
-    public void setPatientRegistrationTextReminder(Boolean patientRegistrationTextReminder) {
-        this.patientRegistrationTextReminder = patientRegistrationTextReminder;
-    }
-
     public String getPatientRegistrationMobileNo() {
         return patientRegistrationMobileNo;
     }
@@ -235,6 +159,38 @@ public class PatientRegistration {
         this.patientRegistrationEmailId = patientRegistrationEmailId;
     }
 
+    public LocalDate getPatientRegistrationDob() {
+        return patientRegistrationDob;
+    }
+
+    public void setPatientRegistrationDob(LocalDate patientRegistrationDob) {
+        this.patientRegistrationDob = patientRegistrationDob;
+    }
+
+    public String getPatientRegistrationChronic() {
+        return patientRegistrationChronic;
+    }
+
+    public void setPatientRegistrationChronic(String patientRegistrationChronic) {
+        this.patientRegistrationChronic = patientRegistrationChronic;
+    }
+
+    public Boolean getPatientRegistrationCallReminder() {
+        return patientRegistrationCallReminder;
+    }
+
+    public void setPatientRegistrationCallReminder(Boolean patientRegistrationCallReminder) {
+        this.patientRegistrationCallReminder = patientRegistrationCallReminder;
+    }
+
+    public Boolean getPatientRegistrationTextReminder() {
+        return patientRegistrationTextReminder;
+    }
+
+    public void setPatientRegistrationTextReminder(Boolean patientRegistrationTextReminder) {
+        this.patientRegistrationTextReminder = patientRegistrationTextReminder;
+    }
+
     public Boolean getPatientRegistrationActive() {
         return patientRegistrationActive;
     }
@@ -243,24 +199,19 @@ public class PatientRegistration {
         this.patientRegistrationActive = patientRegistrationActive;
     }
 
-    public Long getPatientRegistrationPrincipalDoctor() {
-        return patientRegistrationPrincipalDoctor;
+    public Long getPrincipalDoctorId() {
+        return principalDoctorId;
     }
 
-    public void setPatientRegistrationPrincipalDoctor(Long patientRegistrationPrincipalDoctor) {
-        this.patientRegistrationPrincipalDoctor = patientRegistrationPrincipalDoctor;
+    public void setPrincipalDoctorId(Long principalDoctorId) {
+        this.principalDoctorId = principalDoctorId;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_registration_principal_doctor", referencedColumnName = "employee_profile_id", insertable = false, updatable = false)
-    private EmployeeProfile principalDoctor;
-
-    public EmployeeProfile getPrincipalDoctor() {
-        return principalDoctor;
+    public String getPrincipalDoctorName() {
+        return principalDoctorName;
     }
 
-    public void setPrincipalDoctor(EmployeeProfile principalDoctor) {
-        this.principalDoctor = principalDoctor;
+    public void setPrincipalDoctorName(String principalDoctorName) {
+        this.principalDoctorName = principalDoctorName;
     }
-
 }
