@@ -15,8 +15,6 @@ public class AppointmentDTO {
     private String reason;
     private String patientType;
     private String startTime;
-    private String endTime;
-
     public Long getPatientId() {
         return patientId;
     }
@@ -97,11 +95,4 @@ public class AppointmentDTO {
         this.startTime = startTime;
     }
 
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
 }

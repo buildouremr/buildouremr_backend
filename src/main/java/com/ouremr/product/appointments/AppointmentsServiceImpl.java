@@ -200,7 +200,6 @@ public class AppointmentsServiceImpl implements AppointmentsService{
             dto.setReason((String) row[6]);
             dto.setPatientType((String) row[7]);
             dto.setStartTime((String) row[8]);
-            dto.setEndTime((String) row[9]);
             dto.setApptId((Long) row[10]);
 
             list.add(dto);

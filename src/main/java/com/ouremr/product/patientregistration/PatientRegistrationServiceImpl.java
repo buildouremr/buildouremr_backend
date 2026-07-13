@@ -1,8 +1,11 @@
 package com.ouremr.product.patientregistration;
 
+import com.ouremr.product.dto.CreatePatientDTO;
 import com.ouremr.product.dto.ExistingPatientsDTO;
 import com.ouremr.product.dto.PatientDetailsDTO;
+import com.ouremr.product.repositories.ChronicDiseaseRepository;
 import com.ouremr.product.repositories.PatientRegistrationRepository;
+import com.ouremr.product.tables.ChronicDisease;
 import com.ouremr.product.tables.EmployeeProfile;
 import com.ouremr.product.tables.PatientRegistration;
 import jakarta.persistence.EntityManager;
@@ -10,14 +13,17 @@ import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientRegistrationServiceImpl implements PatientRegistrationService{
 
     @Autowired
     PatientRegistrationRepository patientRegistrationRepository;
+
+    @Autowired
+    private ChronicDiseaseRepository chronicDiseaseRepository;
 
     @Autowired
     EntityManager em;
@@ -224,6 +230,14 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
                     em.createQuery(cq)
                             .getResultList();
 
+            Map<Long, String> chronicDiseaseMap =
+                    chronicDiseaseRepository.findAll()
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    ChronicDisease::getChronicDiseaseId,
+                                    ChronicDisease::getChronicDiseaseName
+                            ));
+
             for (Object[] obj : results) {
 
                 PatientRegistration patientEntity =
@@ -268,8 +282,23 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
                 dto.setPatientRegistrationInsuranceName(
                         patientEntity.getPatientRegistrationInsuranceName());
 
-                dto.setPatientRegistrationChronic(
-                        patientEntity.getPatientRegistrationChronic());
+                String chronicIds =
+                        patientEntity.getPatientRegistrationChronic();
+
+                String chronicNames = null;
+
+                if (chronicIds != null && !chronicIds.trim().isEmpty()) {
+
+                    chronicNames = Arrays.stream(chronicIds.split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .map(Long::valueOf)
+                            .map(chronicDiseaseMap::get)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.joining(", "));
+                }
+
+                dto.setPatientRegistrationChronic(chronicNames);
 
                 dto.setPatientRegistrationCallReminder(
                         patientEntity.getPatientRegistrationCallReminder());
@@ -315,4 +344,16 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
 
         return response;
     }
+
+    @Override
+    public List<ChronicDisease> getChronicDiseases() {
+        return chronicDiseaseRepository
+                .findByChronicDiseaseIsActive("true");
+    }
+
+    @Override
+    public Boolean createNewPatient(CreatePatientDTO bean) {
+        return null;
+    }
+
 }
