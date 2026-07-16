@@ -35,11 +35,11 @@ public class SchedulerAppointment {
     @Column(name = "scheduler_appointment_end_time")
     private String schedulerAppointmentEndTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduler_appointment_status")
     private SchedulerAppointmentStatus schedulerAppointmentStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduler_appointment_type")
     private SchedulerAppointmentType schedulerAppointmentType;
 

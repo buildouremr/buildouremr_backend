@@ -75,17 +75,10 @@ public class AppointmentsServiceImpl implements AppointmentsService{
 
                 LocalDate localDate = LocalDate.parse(apptDate);
 
-                OffsetDateTime startOfDay = localDate.atStartOfDay().atOffset(ZoneOffset.UTC);
-                OffsetDateTime endOfDay = localDate.plusDays(1)
-                        .atStartOfDay()
-                        .minusNanos(1)
-                        .atOffset(ZoneOffset.UTC);
-
                 predicates.add(
-                        cb.between(
+                        cb.equal(
                                 appointment.get("schedulerAppointmentAppointmentDate"),
-                                startOfDay,
-                                endOfDay
+                                localDate
                         )
                 );
             }
@@ -294,19 +287,19 @@ public class AppointmentsServiceImpl implements AppointmentsService{
         try {
 
             EmployeeProfile provider =
-                    employeeProfileRepository.findById(bean.getProviderId())
+                    employeeProfileRepository.findById(Long.valueOf(bean.getProviderId()))
                             .orElseThrow(() ->
                                     new RuntimeException("Provider not found"));
 
             SchedulerAppointmentType appointmentType =
                     schedulerAppointmentTypesRepository
-                            .findById(Integer.parseInt(bean.getAppointmentTypeId()))
+                            .findById(Long.valueOf(bean.getAppointmentTypeId()))
                             .orElseThrow(() ->
                                     new RuntimeException("Appointment type not found"));
 
             SchedulerAppointmentStatus appointmentStatus =
                     schedulerAppointmentStatusRepository
-                            .findById(1)
+                            .findById(1L)
                             .orElseThrow(() ->
                                     new RuntimeException("Appointment status not found"));
 
@@ -314,7 +307,7 @@ public class AppointmentsServiceImpl implements AppointmentsService{
 
                 SchedulerAppointment appointment =
                         schedulerAppointmentRepository
-                                .findById((int) Long.parseLong(bean.getAppointmentId()))
+                                .findById(Long.valueOf(bean.getAppointmentId()))
                                 .orElseThrow(() ->
                                         new RuntimeException("Appointment not found"));
 
@@ -346,7 +339,7 @@ public class AppointmentsServiceImpl implements AppointmentsService{
 
                 patient =
                         patientRegistrationRepository
-                                .findById((int) Long.parseLong(bean.getPatientId()))
+                                .findById(Long.valueOf(bean.getPatientId()))
                                 .orElseThrow(() ->
                                         new RuntimeException("Patient not found"));
 

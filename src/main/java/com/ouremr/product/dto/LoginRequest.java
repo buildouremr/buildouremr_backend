@@ -1,17 +1,22 @@
 package com.ouremr.product.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequest {
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String userEmail;
-    private String password;
 
-    private String OTP;
+    @NotBlank(message = "Password is required")
+    private String password;
 
     public String getUserEmail() {
         return userEmail;
     }
 
-    public void setUserName(String userName) {
+    public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
 
@@ -21,13 +26,5 @@ public class LoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getOTP() {
-        return OTP;
-    }
-
-    public void setOTP(String OTP) {
-        this.OTP = OTP;
     }
 }

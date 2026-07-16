@@ -9,6 +9,8 @@ import com.ouremr.product.tables.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.List;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
+
+    private static final Logger log = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
     @PersistenceContext
     private EntityManager em;
@@ -79,7 +83,7 @@ public class DashboardServiceImpl implements DashboardService {
                 list.add(dto);
             }
         } catch (Exception e) {
-           e.printStackTrace();
+            log.error("Error fetching team list", e);
         }
         return list;
     }

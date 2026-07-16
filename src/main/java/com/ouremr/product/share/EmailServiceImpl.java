@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailServiceImpl implements EmailService{
+public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
@@ -18,5 +18,7 @@ public class EmailServiceImpl implements EmailService{
         message.setText("Your OTP is: " + otp);
 
         mailSender.send(message);
+        System.out.println("OTP sent successfully: " + otp);
     }
 }
+

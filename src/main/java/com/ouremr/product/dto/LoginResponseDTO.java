@@ -3,14 +3,16 @@ package com.ouremr.product.dto;
 public class LoginResponseDTO {
 
     private Long userId;
-    private String token;
+    private String userName;
+    private String userEmail;
 
     public LoginResponseDTO() {
     }
 
-    public LoginResponseDTO(Long userId, String token) {
+    public LoginResponseDTO(Long userId, String userName, String userEmail) {
         this.userId = userId;
-        this.token = token;
+        this.userName = userName;
+        this.userEmail = userEmail;
     }
 
     public Long getUserId() {
@@ -21,11 +23,19 @@ public class LoginResponseDTO {
         this.userId = userId;
     }
 
-    public String getToken() {
-        return token;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }
