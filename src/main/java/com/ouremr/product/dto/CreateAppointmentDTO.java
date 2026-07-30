@@ -10,8 +10,11 @@ public class CreateAppointmentDTO {
     private String middleName;
     private String lastName;
     private String mobileNumber;
+    private String email;
     private String dateOfBirth;
     private String gender;
+    private String location;
+    private String chronicDisease;
 
     // Appointment Details
     private Long providerId;
@@ -66,6 +69,30 @@ public class CreateAppointmentDTO {
 
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getChronicDisease() {
+        return chronicDisease;
+    }
+
+    public void setChronicDisease(String chronicDisease) {
+        this.chronicDisease = chronicDisease;
     }
 
     public String getDateOfBirth() {

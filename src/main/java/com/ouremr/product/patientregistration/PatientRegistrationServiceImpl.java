@@ -12,6 +12,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import com.ouremr.product.tables.SchedulerAppointment;
+import com.ouremr.product.tables.SchedulerAppointmentStatus;
+import com.ouremr.product.repositories.SchedulerAppointmentRepository;
+import com.ouremr.product.repositories.SchedulerAppointmentStatusRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +31,12 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
 
     @Autowired
     private ChronicDiseaseRepository chronicDiseaseRepository;
+
+    @Autowired
+    private SchedulerAppointmentRepository appointmentRepository;
+
+    @Autowired
+    private SchedulerAppointmentStatusRepository statusRepository;
 
     @Autowired
     EntityManager em;
@@ -174,61 +187,15 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
 
         try {
 
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+            String hql = "SELECT p, d.employeeProfileId, " +
+                         "CONCAT(COALESCE(d.employeeProfileFirstName, ''), ' ', " +
+                         "COALESCE(d.employeeProfileMiddleName, ''), ' ', " +
+                         "COALESCE(d.employeeProfileLastName, '')) " +
+                         "FROM PatientRegistration p " +
+                         "LEFT JOIN EmployeeProfile d ON p.patientRegistrationPrincipalDoctor = d.employeeProfileId " +
+                         "ORDER BY p.patientRegistrationId ASC";
 
-            Root<PatientRegistration> patient =
-                    cq.from(PatientRegistration.class);
-
-            Root<EmployeeProfile> doctor =
-                    cq.from(EmployeeProfile.class);
-
-            cq.multiselect(
-                    patient,
-                    doctor.get("employeeProfileId"),
-
-                    cb.concat(
-                            cb.concat(
-                                    cb.coalesce(
-                                            doctor.get("employeeProfileFirstName"),
-                                            ""),
-                                    " "
-                            ),
-                            cb.concat(
-                                    cb.coalesce(
-                                            doctor.get("employeeProfileMiddleName"),
-                                            ""),
-                                    cb.concat(
-                                            " ",
-                                            cb.coalesce(
-                                                    doctor.get("employeeProfileLastName"),
-                                                    "")
-                                    )
-                            )
-                    )
-            );
-
-            cq.where(
-                    cb.or(
-                            cb.equal(
-                                    patient.get("patientRegistrationPrincipalDoctor"),
-                                    doctor.get("employeeProfileId")
-                            ),
-                            cb.isNull(
-                                    patient.get("patientRegistrationPrincipalDoctor")
-                            )
-                    )
-            );
-
-            cq.orderBy(
-                    cb.asc(
-                            patient.get("patientRegistrationId")
-                    )
-            );
-
-            List<Object[]> results =
-                    em.createQuery(cq)
-                            .getResultList();
+            List<Object[]> results = em.createQuery(hql, Object[].class).getResultList();
 
             Map<Long, String> chronicDiseaseMap =
                     chronicDiseaseRepository.findAll()
@@ -352,8 +319,104 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
     }
 
     @Override
+    @Transactional
     public Boolean createNewPatient(CreatePatientDTO bean) {
-        return null;
+        if (bean == null) throw new IllegalArgumentException("Request data cannot be null");
+        if (bean.getPatientFirstName() == null || bean.getPatientFirstName().trim().isEmpty()) {
+            throw new IllegalArgumentException("First Name is required");
+        }
+        if (bean.getPatientLastName() == null || bean.getPatientLastName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Last Name is required");
+        }
+        if (bean.getPatientMobileNumber() == null || bean.getPatientMobileNumber().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mobile Number is required");
+        }
+
+        // Duplicate check based on Name + Mobile
+        List<PatientRegistration> existing = patientRegistrationRepository.findByPatientRegistrationFirstNameIgnoreCaseAndPatientRegistrationLastNameIgnoreCaseAndPatientRegistrationMobileNo(
+                bean.getPatientFirstName().trim(),
+                bean.getPatientLastName().trim(),
+                bean.getPatientMobileNumber().trim()
+        );
+        if (!existing.isEmpty()) {
+            throw new IllegalArgumentException("A patient with this name and mobile number already exists.");
+        }
+
+        PatientRegistration patient = new PatientRegistration();
+        patient.setPatientRegistrationFirstName(bean.getPatientFirstName().trim());
+        patient.setPatientRegistrationMiddleName(bean.getPatientMiddleName() != null ? bean.getPatientMiddleName().trim() : null);
+        patient.setPatientRegistrationLastName(bean.getPatientLastName().trim());
+        patient.setPatientRegistrationMobileNo(bean.getPatientMobileNumber().trim());
+        patient.setPatientRegistrationOtherMobileNo(bean.getPatientEmergencyContact() != null ? bean.getPatientEmergencyContact().trim() : null);
+        patient.setPatientRegistrationEmailId(bean.getPatientEmailId() != null ? bean.getPatientEmailId().trim() : null);
+        
+        if (bean.getDateOfBirth() != null && !bean.getDateOfBirth().trim().isEmpty()) {
+            try {
+                // Expected YYYY-MM-DD from frontend, but let's parse safely
+                patient.setPatientRegistrationDob(LocalDate.parse(bean.getDateOfBirth().trim()));
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid Date of Birth format.");
+            }
+        }
+        
+        // Map Gender: "Male" -> "M", "Female" -> "F", "Other" -> "O"
+        if (bean.getGender() != null) {
+            String g = bean.getGender().trim().toLowerCase();
+            if (g.startsWith("m")) patient.setPatientRegistrationSex("M");
+            else if (g.startsWith("f")) patient.setPatientRegistrationSex("F");
+            else patient.setPatientRegistrationSex("O");
+        }
+
+        patient.setPatientRegistrationAddress(bean.getPatientLocation() != null ? bean.getPatientLocation().trim() : null);
+        patient.setPatientRegistrationChronic(bean.getPatientChronicHistory() != null ? bean.getPatientChronicHistory().trim() : null);
+        patient.setPatientRegistrationActive(true);
+
+        PatientRegistration savedPatient = patientRegistrationRepository.save(patient);
+
+        // Schedule Appointment if details are provided
+        if (bean.getProviderId() != null && bean.getAppointmentDate() != null && !bean.getAppointmentDate().trim().isEmpty()) {
+            SchedulerAppointment appt = new SchedulerAppointment();
+            appt.setSchedulerAppointmentPatientId(savedPatient.getPatientRegistrationId());
+            appt.setSchedulerAppointmentPatientName(savedPatient.getPatientRegistrationFirstName() + " " + savedPatient.getPatientRegistrationLastName());
+            appt.setSchedulerAppointmentProviderId(bean.getProviderId());
+            
+            try {
+                appt.setSchedulerAppointmentAppointmentDate(LocalDate.parse(bean.getAppointmentDate().trim()));
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid Appointment Date format.");
+            }
+            
+            appt.setSchedulerAppointmentStartTime(bean.getAppointmentTime());
+            
+            // Calculate end time (+15 mins)
+            if (bean.getAppointmentTime() != null && bean.getAppointmentTime().contains(":")) {
+                String[] parts = bean.getAppointmentTime().split(":");
+                try {
+                    int h = Integer.parseInt(parts[0]);
+                    int m = Integer.parseInt(parts[1]);
+                    m += 15;
+                    if (m >= 60) {
+                        m -= 60;
+                        h += 1;
+                    }
+                    appt.setSchedulerAppointmentEndTime(String.format("%02d:%02d", h, m));
+                } catch (Exception e) {
+                    appt.setSchedulerAppointmentEndTime(bean.getAppointmentTime());
+                }
+            }
+            
+            appt.setSchedulerAppointmentReason(bean.getChiefComplaint());
+            
+            // Set status to "Pending" (Assuming ID 1 is Pending, typical in this DB)
+            SchedulerAppointmentStatus status = statusRepository.findById(1L).orElse(null);
+            if (status != null) {
+                appt.setSchedulerAppointmentStatus(status);
+            }
+            
+            appointmentRepository.save(appt);
+        }
+
+        return true;
     }
 
 }

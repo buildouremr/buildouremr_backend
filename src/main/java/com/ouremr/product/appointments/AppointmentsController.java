@@ -16,7 +16,9 @@ public class AppointmentsController {
     AppointmentsService appointmentservice;
 
     @GetMapping("/getAppointmentStatusCounts")
-    public ResponseEntity<EMRResponseBean> getAppointmentStatusCounts(@RequestParam(value = "userId") Long userId, @RequestParam(value = "apptDate") String apptDate) {
+    public ResponseEntity<EMRResponseBean> getAppointmentStatusCounts(
+            @RequestParam(value = "userId") Long userId,
+            @RequestParam(value = "apptDate") String apptDate) {
         EMRResponseBean response = new EMRResponseBean();
         AppointmentStatusCountsDTO data = appointmentservice.getAppointmentStatusCounts(userId, apptDate);
         response.setData(data);
@@ -25,7 +27,10 @@ public class AppointmentsController {
     }
 
     @GetMapping("/getAppointments")
-    public ResponseEntity<EMRResponseBean> getAppointments(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "apptDate") String apptDate, @RequestParam(value = "pageNo") Integer pageNo) {
+    public ResponseEntity<EMRResponseBean> getAppointments(
+            @RequestParam(value = "userId") Integer userId,
+            @RequestParam(value = "apptDate") String apptDate,
+            @RequestParam(value = "pageNo") Integer pageNo) {
         EMRResponseBean response = new EMRResponseBean();
         List<AppointmentDTO> data = appointmentservice.getAppointments(userId, apptDate, pageNo);
         response.setData(data);
@@ -34,7 +39,8 @@ public class AppointmentsController {
     }
 
     @GetMapping("/getAppointmentPatientDetails")
-    public ResponseEntity<EMRResponseBean> getAppointmentPatientDetails(@RequestParam(value = "appointmentId") Long appointmentId) {
+    public ResponseEntity<EMRResponseBean> getAppointmentPatientDetails(
+            @RequestParam(value = "appointmentId") Long appointmentId) {
         EMRResponseBean response = new EMRResponseBean();
         AppointmentPatientDetailDTO data = appointmentservice.getAppointmentPatientDetail(appointmentId);
         response.setData(data);
@@ -45,7 +51,8 @@ public class AppointmentsController {
     @PostMapping("/createAppointments")
     public ResponseEntity<EMRResponseBean> createAppointments(@RequestBody CreateAppointmentDTO bean) {
         EMRResponseBean response = new EMRResponseBean();
-        response.setData(appointmentservice.createAppointments(bean));
+        appointmentservice.createAppointments(bean);
+        response.setData(true);
         response.setStatus("SUCCESS");
         return ResponseEntity.ok(response);
     }
