@@ -259,8 +259,15 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
                     chronicNames = Arrays.stream(chronicIds.split(","))
                             .map(String::trim)
                             .filter(s -> !s.isEmpty())
-                            .map(Long::valueOf)
-                            .map(chronicDiseaseMap::get)
+                            .map(s -> {
+                                try {
+                                    Long id = Long.valueOf(s);
+                                    String name = chronicDiseaseMap.get(id);
+                                    return name != null ? name : s;
+                                } catch (NumberFormatException e) {
+                                    return s;
+                                }
+                            })
                             .filter(Objects::nonNull)
                             .collect(Collectors.joining(", "));
                 }
