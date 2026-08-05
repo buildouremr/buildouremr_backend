@@ -19,7 +19,7 @@ public class UserLogin {
     @Column(name = "user_email", nullable = false, unique = true)
     private String userEmail;
 
-    @JsonIgnore
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     @Column(name = "user_password", nullable = false)
     private String userPassword;
 
