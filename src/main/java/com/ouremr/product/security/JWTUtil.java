@@ -107,7 +107,7 @@ public class JWTUtil {
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(cookieMaxAge);
-        cookie.setAttribute("SameSite", "Strict");
+        cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 
@@ -120,7 +120,7 @@ public class JWTUtil {
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setAttribute("SameSite", "Strict");
+        cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 
