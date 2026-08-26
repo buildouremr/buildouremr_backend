@@ -15,6 +15,10 @@ public class CreatePatientDTO {
     private String patientEmailId;
     private String dateOfBirth;
     private String gender;
+    private String height;
+    private String weight;
+    private String bmi;
+    private String bloodGroup;
 
     // Appointment Details
     private Long providerId;
@@ -111,6 +115,38 @@ public class CreatePatientDTO {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public void setWeight(String weight) {
+        this.weight = weight;
+    }
+
+    public String getBmi() {
+        return bmi;
+    }
+
+    public void setBmi(String bmi) {
+        this.bmi = bmi;
+    }
+
+    public String getBloodGroup() {
+        return bloodGroup;
+    }
+
+    public void setBloodGroup(String bloodGroup) {
+        this.bloodGroup = bloodGroup;
     }
 
     public Long getProviderId() {

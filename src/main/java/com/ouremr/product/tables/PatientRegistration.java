@@ -2,6 +2,7 @@ package com.ouremr.product.tables;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "patient_registration")
@@ -63,8 +64,6 @@ public class PatientRegistration {
     @Column(name = "patient_registration_image")
     private String patientRegistrationImage;
 
-    @Column(name = "patient_registration_blood_group")
-    private String patientRegistrationBloodGroup;
 
     @Column(name = "patient_registration_email_id")
     private String patientRegistrationEmailId;
@@ -74,6 +73,26 @@ public class PatientRegistration {
 
     @Column(name = "patient_registration_principal_doctor")
     private Long patientRegistrationPrincipalDoctor;
+
+
+
+    @Column(name = "patient_registration_allergies")
+    private String patientRegistrationAllergies;
+
+    @Column(name = "patient_registration_risk_factors")
+    private String patientRegistrationRiskFactors;
+
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "modified_on")
+    private LocalDateTime modifiedOn;
+
+    @Column(name = "modified_by")
+    private String modifiedBy;
 
     public Long getPatientRegistrationId() {
         return patientRegistrationId;
@@ -219,13 +238,6 @@ public class PatientRegistration {
         this.patientRegistrationImage = patientRegistrationImage;
     }
 
-    public String getPatientRegistrationBloodGroup() {
-        return patientRegistrationBloodGroup;
-    }
-
-    public void setPatientRegistrationBloodGroup(String patientRegistrationBloodGroup) {
-        this.patientRegistrationBloodGroup = patientRegistrationBloodGroup;
-    }
 
     public String getPatientRegistrationEmailId() {
         return patientRegistrationEmailId;
@@ -261,6 +273,55 @@ public class PatientRegistration {
 
     public void setPrincipalDoctor(EmployeeProfile principalDoctor) {
         this.principalDoctor = principalDoctor;
+    }
+
+
+    public String getPatientRegistrationAllergies() {
+        return patientRegistrationAllergies;
+    }
+
+    public void setPatientRegistrationAllergies(String patientRegistrationAllergies) {
+        this.patientRegistrationAllergies = patientRegistrationAllergies;
+    }
+
+    public String getPatientRegistrationRiskFactors() {
+        return patientRegistrationRiskFactors;
+    }
+
+    public void setPatientRegistrationRiskFactors(String patientRegistrationRiskFactors) {
+        this.patientRegistrationRiskFactors = patientRegistrationRiskFactors;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(LocalDateTime modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 
 }

@@ -21,7 +21,9 @@ import com.ouremr.product.repositories.SchedulerAppointmentRepository;
 import com.ouremr.product.repositories.SchedulerAppointmentStatusRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import com.ouremr.product.repositories.PatientVitalsRepository;
+import com.ouremr.product.tables.PatientVitals;
+import java.time.LocalDateTime;
 
 @Service
 public class PatientRegistrationServiceImpl implements PatientRegistrationService{
@@ -37,6 +39,9 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
 
     @Autowired
     private SchedulerAppointmentStatusRepository statusRepository;
+    
+    @Autowired
+    private PatientVitalsRepository vitalsRepository;
 
     @Autowired
     EntityManager em;
@@ -379,6 +384,40 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
         patient.setPatientRegistrationActive(true);
 
         PatientRegistration savedPatient = patientRegistrationRepository.save(patient);
+
+        // Save Height, Weight, BMI as Vitals
+        if (bean.getHeight() != null && !bean.getHeight().trim().isEmpty()) {
+            PatientVitals v = new PatientVitals();
+            v.setPatientId(savedPatient.getPatientRegistrationId());
+            v.setVitalHeader("Height");
+            v.setVitalData(bean.getHeight().trim());
+            v.setPatientVitalsCreatedOn(LocalDateTime.now());
+            vitalsRepository.save(v);
+        }
+        if (bean.getWeight() != null && !bean.getWeight().trim().isEmpty()) {
+            PatientVitals v = new PatientVitals();
+            v.setPatientId(savedPatient.getPatientRegistrationId());
+            v.setVitalHeader("Weight");
+            v.setVitalData(bean.getWeight().trim());
+            v.setPatientVitalsCreatedOn(LocalDateTime.now());
+            vitalsRepository.save(v);
+        }
+        if (bean.getBmi() != null && !bean.getBmi().trim().isEmpty()) {
+            PatientVitals v = new PatientVitals();
+            v.setPatientId(savedPatient.getPatientRegistrationId());
+            v.setVitalHeader("BMI");
+            v.setVitalData(bean.getBmi().trim());
+            v.setPatientVitalsCreatedOn(LocalDateTime.now());
+            vitalsRepository.save(v);
+        }
+        if (bean.getBloodGroup() != null && !bean.getBloodGroup().trim().isEmpty()) {
+            PatientVitals v = new PatientVitals();
+            v.setPatientId(savedPatient.getPatientRegistrationId());
+            v.setVitalHeader("Blood Group");
+            v.setVitalData(bean.getBloodGroup().trim());
+            v.setPatientVitalsCreatedOn(LocalDateTime.now());
+            vitalsRepository.save(v);
+        }
 
         // Schedule Appointment if details are provided
         if (bean.getProviderId() != null && bean.getAppointmentDate() != null && !bean.getAppointmentDate().trim().isEmpty()) {

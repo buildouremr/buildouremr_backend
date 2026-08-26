@@ -107,7 +107,11 @@ public class JWTUtil {
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(cookieMaxAge);
-        cookie.setAttribute("SameSite", "None");
+        if (cookieSecure) {
+            cookie.setAttribute("SameSite", "None");
+        } else {
+            cookie.setAttribute("SameSite", "Lax");
+        }
         response.addCookie(cookie);
     }
 
@@ -120,7 +124,11 @@ public class JWTUtil {
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setAttribute("SameSite", "None");
+        if (cookieSecure) {
+            cookie.setAttribute("SameSite", "None");
+        } else {
+            cookie.setAttribute("SameSite", "Lax");
+        }
         response.addCookie(cookie);
     }
 
