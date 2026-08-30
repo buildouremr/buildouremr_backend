@@ -1,0 +1,6 @@
+{
+  "patientId": 1,
+  "encounterId": 2,
+  "examination": ["test"],
+  "treatmentPlan": ["test"]
+}
