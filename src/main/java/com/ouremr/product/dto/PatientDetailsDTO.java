@@ -18,7 +18,7 @@ public class PatientDetailsDTO {
     private String patientRegistrationMobileNo;
     private String patientRegistrationOtherMobileNo;
     private String patientRegistrationImage;
-    private String patientRegistrationBloodGroup;
+
     private String patientRegistrationEmailId;
 
     private LocalDate patientRegistrationDob;
@@ -143,13 +143,7 @@ public class PatientDetailsDTO {
         this.patientRegistrationImage = patientRegistrationImage;
     }
 
-    public String getPatientRegistrationBloodGroup() {
-        return patientRegistrationBloodGroup;
-    }
 
-    public void setPatientRegistrationBloodGroup(String patientRegistrationBloodGroup) {
-        this.patientRegistrationBloodGroup = patientRegistrationBloodGroup;
-    }
 
     public String getPatientRegistrationEmailId() {
         return patientRegistrationEmailId;

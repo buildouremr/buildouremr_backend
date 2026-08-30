@@ -12,14 +12,12 @@ public class PatientPrescription {
     @Column(name = "patient_prescription_id")
     private Long patientPrescriptionId;
 
-    @Column(name = "patient_visit_chart_id")
-    private Long patientVisitChartId;
 
-    @Column(name = "encounter_id")
-    private Long encounterId;
+    @Column(name = "patient_prescription_encounter_id")
+    private Long patientPrescriptionEncounterId;
 
-    @Column(name = "patient_id")
-    private Long patientId;
+    @Column(name = "patient_prescription_patient_id")
+    private Long patientPrescriptionPatientId;
 
     @Column(name = "medication_id")
     private Long medicationId;
@@ -48,9 +46,9 @@ public class PatientPrescription {
     @Column(name = "patient_prescription_modified_by")
     private String patientPrescriptionModifiedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_visit_chart_id", referencedColumnName = "patient_visit_chart_id", insertable = false, updatable = false)
-    private PatientVisitChart patientVisitChart;
+    @Column(name = "is_active", insertable = false)
+    private Boolean isActive = true;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medication_id", insertable = false, updatable = false)
@@ -64,28 +62,21 @@ public class PatientPrescription {
         this.patientPrescriptionId = patientPrescriptionId;
     }
 
-    public Long getPatientVisitChartId() {
-        return patientVisitChartId;
+
+    public Long getPatientPrescriptionEncounterId() {
+        return patientPrescriptionEncounterId;
     }
 
-    public void setPatientVisitChartId(Long patientVisitChartId) {
-        this.patientVisitChartId = patientVisitChartId;
+    public void setPatientPrescriptionEncounterId(Long patientPrescriptionEncounterId) {
+        this.patientPrescriptionEncounterId = patientPrescriptionEncounterId;
     }
 
-    public Long getEncounterId() {
-        return encounterId;
+    public Long getPatientPrescriptionPatientId() {
+        return patientPrescriptionPatientId;
     }
 
-    public void setEncounterId(Long encounterId) {
-        this.encounterId = encounterId;
-    }
-
-    public Long getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
+    public void setPatientPrescriptionPatientId(Long patientPrescriptionPatientId) {
+        this.patientPrescriptionPatientId = patientPrescriptionPatientId;
     }
 
     public Long getMedicationId() {
@@ -160,13 +151,14 @@ public class PatientPrescription {
         this.patientPrescriptionModifiedBy = patientPrescriptionModifiedBy;
     }
 
-    public PatientVisitChart getPatientVisitChart() {
-        return patientVisitChart;
+    public Boolean getIsActive() {
+        return isActive;
     }
 
-    public void setPatientVisitChart(PatientVisitChart patientVisitChart) {
-        this.patientVisitChart = patientVisitChart;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
+
 
     public Medication getMedication() {
         return medication;

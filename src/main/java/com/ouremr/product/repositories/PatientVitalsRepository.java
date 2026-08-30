@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface PatientVitalsRepository extends JpaRepository<PatientVitals, Long> {
-    List<PatientVitals> findByPatientVisitChartId(Long patientVisitChartId);
-    List<PatientVitals> findByEncounterId(Long encounterId);
     List<PatientVitals> findByPatientIdOrderByPatientVitalsCreatedOnDesc(Long patientId);
+    List<PatientVitals> findByEncounter_EncounterId(Long encounterId);
 }

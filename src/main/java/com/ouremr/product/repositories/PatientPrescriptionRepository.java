@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface PatientPrescriptionRepository extends JpaRepository<PatientPrescription, Long> {
-    List<PatientPrescription> findByPatientVisitChartId(Long patientVisitChartId);
-    void deleteByPatientVisitChartId(Long patientVisitChartId);
+    List<PatientPrescription> findByPatientPrescriptionEncounterIdAndIsActiveTrue(Long encounterId);
+    void deleteByPatientPrescriptionEncounterId(Long encounterId);
 }

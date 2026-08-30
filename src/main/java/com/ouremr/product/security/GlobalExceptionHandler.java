@@ -100,19 +100,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<EMRResponseBean> handleRuntimeException(RuntimeException ex) {
         log.error("Unhandled runtime exception: {}", ex.getMessage(), ex);
         EMRResponseBean response = new EMRResponseBean();
-        response.setData("An unexpected error occurred");
+        response.setData(ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred");
         response.setStatus("FAILED");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    /**
-     * Catch-all for any other exceptions.
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<EMRResponseBean> handleGenericException(Exception ex) {
         log.error("Unhandled exception: {}", ex.getMessage(), ex);
         EMRResponseBean response = new EMRResponseBean();
-        response.setData("Internal server error");
+        response.setData("Internal server error: " + ex.getMessage());
         response.setStatus("FAILED");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

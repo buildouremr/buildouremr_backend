@@ -3,6 +3,7 @@ package com.ouremr.product.tables;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -46,6 +47,15 @@ public class SchedulerAppointment {
     @ManyToOne
     @JoinColumn(name = "scheduler_appointment_providerid", referencedColumnName = "employee_profile_id", insertable = false, updatable = false)
     private EmployeeProfile schedulerAppointmentProvider;
+
+    @Column(name = "scheduler_appointment_created_by")
+    private String schedulerAppointmentCreatedBy;
+
+    @Column(name = "scheduler_appointment_modified_by")
+    private String schedulerAppointmentModifiedBy;
+
+    @Column(name = "scheduler_appointment_modified_on")
+    private LocalDateTime schedulerAppointmentModifiedOn;
 
     public Long getSchedulerAppointmentId() {
         return schedulerAppointmentId;
@@ -133,5 +143,29 @@ public class SchedulerAppointment {
 
     public void setSchedulerAppointmentProvider(EmployeeProfile schedulerAppointmentProvider) {
         this.schedulerAppointmentProvider = schedulerAppointmentProvider;
+    }
+
+    public String getSchedulerAppointmentCreatedBy() {
+        return schedulerAppointmentCreatedBy;
+    }
+
+    public void setSchedulerAppointmentCreatedBy(String schedulerAppointmentCreatedBy) {
+        this.schedulerAppointmentCreatedBy = schedulerAppointmentCreatedBy;
+    }
+
+    public String getSchedulerAppointmentModifiedBy() {
+        return schedulerAppointmentModifiedBy;
+    }
+
+    public void setSchedulerAppointmentModifiedBy(String schedulerAppointmentModifiedBy) {
+        this.schedulerAppointmentModifiedBy = schedulerAppointmentModifiedBy;
+    }
+
+    public LocalDateTime getSchedulerAppointmentModifiedOn() {
+        return schedulerAppointmentModifiedOn;
+    }
+
+    public void setSchedulerAppointmentModifiedOn(LocalDateTime schedulerAppointmentModifiedOn) {
+        this.schedulerAppointmentModifiedOn = schedulerAppointmentModifiedOn;
     }
 }

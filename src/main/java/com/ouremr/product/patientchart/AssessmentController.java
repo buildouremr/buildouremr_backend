@@ -1,6 +1,5 @@
 package com.ouremr.product.patientchart;
 
-import com.ouremr.product.dto.MedicationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,27 +8,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ouremr.product.emrbean.EMRResponseBean;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/medications")
-public class MedicationController {
+@RequestMapping("/api/assessments")
+public class AssessmentController {
 
     @Autowired
-    private MedicationService medicationService;
+    private AssessmentService assessmentService;
 
-    @GetMapping("/all")
-    public ResponseEntity<EMRResponseBean> getAllMedications() {
+    @GetMapping("/search")
+    public ResponseEntity<EMRResponseBean> searchAssessments(@RequestParam("keyword") String keyword) {
         EMRResponseBean response = new EMRResponseBean();
-        response.setData(medicationService.getAllMedications());
+        response.setData(assessmentService.searchAssessments(keyword));
         response.setStatus("SUCCESS");
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<EMRResponseBean> searchMedications(@RequestParam("keyword") String keyword) {
+    @GetMapping("/recent")
+    public ResponseEntity<EMRResponseBean> getRecentAssessments() {
         EMRResponseBean response = new EMRResponseBean();
-        response.setData(medicationService.searchMedications(keyword));
+        response.setData(assessmentService.getRecentAssessments());
         response.setStatus("SUCCESS");
         return ResponseEntity.ok(response);
     }

@@ -19,6 +19,14 @@ public class MedicationService {
         return medicationRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    public List<MedicationDTO> searchMedications(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+        return medicationRepository.findByNameContainingIgnoreCase(keyword)
+                .stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
     private MedicationDTO convertToDTO(Medication entity) {
         MedicationDTO dto = new MedicationDTO();
         dto.setId(entity.getId());

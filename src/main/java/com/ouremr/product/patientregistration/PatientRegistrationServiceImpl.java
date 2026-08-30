@@ -21,6 +21,7 @@ import com.ouremr.product.repositories.SchedulerAppointmentRepository;
 import com.ouremr.product.repositories.SchedulerAppointmentStatusRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import com.ouremr.product.repositories.PatientVitalsRepository;
 import com.ouremr.product.tables.PatientVitals;
 import java.time.LocalDateTime;
@@ -294,8 +295,6 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
                 dto.setPatientRegistrationImage(
                         patientEntity.getPatientRegistrationImage());
 
-                dto.setPatientRegistrationBloodGroup(
-                        patientEntity.getPatientRegistrationBloodGroup());
 
                 dto.setPatientRegistrationEmailId(
                         patientEntity.getPatientRegistrationEmailId());
@@ -383,41 +382,18 @@ public class PatientRegistrationServiceImpl implements PatientRegistrationServic
         patient.setPatientRegistrationChronic(bean.getPatientChronicHistory() != null ? bean.getPatientChronicHistory().trim() : null);
         patient.setPatientRegistrationActive(true);
 
-        PatientRegistration savedPatient = patientRegistrationRepository.save(patient);
+        if (bean.getHeight() != null && !bean.getHeight().trim().isEmpty() ||
+            bean.getWeight() != null && !bean.getWeight().trim().isEmpty() ||
+            bean.getBmi() != null && !bean.getBmi().trim().isEmpty() ||
+            bean.getBloodGroup() != null && !bean.getBloodGroup().trim().isEmpty()) {
+            
+            // Note: Since these properties are moved to PatientVitals JSONB, we should save them there instead.
+            // But they are not attached to an encounter yet for a newly registered patient.
+            // So we might need to handle this in a separate service or wait for their first chart.
+            // For now, we skip saving them to PatientRegistration.
+        }
 
-        // Save Height, Weight, BMI as Vitals
-        if (bean.getHeight() != null && !bean.getHeight().trim().isEmpty()) {
-            PatientVitals v = new PatientVitals();
-            v.setPatientId(savedPatient.getPatientRegistrationId());
-            v.setVitalHeader("Height");
-            v.setVitalData(bean.getHeight().trim());
-            v.setPatientVitalsCreatedOn(LocalDateTime.now());
-            vitalsRepository.save(v);
-        }
-        if (bean.getWeight() != null && !bean.getWeight().trim().isEmpty()) {
-            PatientVitals v = new PatientVitals();
-            v.setPatientId(savedPatient.getPatientRegistrationId());
-            v.setVitalHeader("Weight");
-            v.setVitalData(bean.getWeight().trim());
-            v.setPatientVitalsCreatedOn(LocalDateTime.now());
-            vitalsRepository.save(v);
-        }
-        if (bean.getBmi() != null && !bean.getBmi().trim().isEmpty()) {
-            PatientVitals v = new PatientVitals();
-            v.setPatientId(savedPatient.getPatientRegistrationId());
-            v.setVitalHeader("BMI");
-            v.setVitalData(bean.getBmi().trim());
-            v.setPatientVitalsCreatedOn(LocalDateTime.now());
-            vitalsRepository.save(v);
-        }
-        if (bean.getBloodGroup() != null && !bean.getBloodGroup().trim().isEmpty()) {
-            PatientVitals v = new PatientVitals();
-            v.setPatientId(savedPatient.getPatientRegistrationId());
-            v.setVitalHeader("Blood Group");
-            v.setVitalData(bean.getBloodGroup().trim());
-            v.setPatientVitalsCreatedOn(LocalDateTime.now());
-            vitalsRepository.save(v);
-        }
+        PatientRegistration savedPatient = patientRegistrationRepository.save(patient);
 
         // Schedule Appointment if details are provided
         if (bean.getProviderId() != null && bean.getAppointmentDate() != null && !bean.getAppointmentDate().trim().isEmpty()) {

@@ -12,20 +12,25 @@ public class PatientVitals {
     @Column(name = "patient_vitals_id")
     private Long patientVitalsId;
 
-    @Column(name = "patient_visit_chart_id")
-    private Long patientVisitChartId;
-
-    @Column(name = "encounter_id")
-    private Long encounterId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "encounter_id", referencedColumnName = "encounter_id", nullable = false)
+    private Encounter encounter;
 
     @Column(name = "patient_id")
     private Long patientId;
 
-    @Column(name = "vital_header")
-    private String vitalHeader;
-
-    @Column(name = "vital_data")
-    private String vitalData;
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
+    @Column(name = "patient_vital_data", columnDefinition = "jsonb default '{\"BP\": {\"value\": \"-- / --\", \"date\": \"-\"}, \"HR\": {\"value\": \"-- bpm\", \"date\": \"-\"}, \"SpO2\": {\"value\": \"--%\", \"date\": \"-\"}, \"Temp\": {\"value\": \"-- °C\", \"date\": \"-\"}, \"Height\": {\"value\": \"-\", \"date\": \"-\"}, \"Weight\": {\"value\": \"-\", \"date\": \"-\"}, \"BMI\": {\"value\": \"-\", \"date\": \"-\"}, \"Blood Group\": {\"value\": \"-\", \"date\": \"-\"}}'")
+    private java.util.Map<String, Object> patientVitalData = new java.util.HashMap<>(java.util.Map.of(
+        "BP", java.util.Map.of("value", "-- / --", "date", "-"),
+        "HR", java.util.Map.of("value", "-- bpm", "date", "-"),
+        "SpO2", java.util.Map.of("value", "--%", "date", "-"),
+        "Temp", java.util.Map.of("value", "-- °C", "date", "-"),
+        "Height", java.util.Map.of("value", "-", "date", "-"),
+        "Weight", java.util.Map.of("value", "-", "date", "-"),
+        "BMI", java.util.Map.of("value", "-", "date", "-"),
+        "Blood Group", java.util.Map.of("value", "-", "date", "-")
+    ));
 
     @Column(name = "patient_vitals_created_on")
     private LocalDateTime patientVitalsCreatedOn;
@@ -39,9 +44,6 @@ public class PatientVitals {
     @Column(name = "patient_vitals_modified_by")
     private String patientVitalsModifiedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_visit_chart_id", referencedColumnName = "patient_visit_chart_id", insertable = false, updatable = false)
-    private PatientVisitChart patientVisitChart;
 
     public Long getPatientVitalsId() {
         return patientVitalsId;
@@ -51,20 +53,12 @@ public class PatientVitals {
         this.patientVitalsId = patientVitalsId;
     }
 
-    public Long getPatientVisitChartId() {
-        return patientVisitChartId;
+    public Encounter getEncounter() {
+        return encounter;
     }
 
-    public void setPatientVisitChartId(Long patientVisitChartId) {
-        this.patientVisitChartId = patientVisitChartId;
-    }
-
-    public Long getEncounterId() {
-        return encounterId;
-    }
-
-    public void setEncounterId(Long encounterId) {
-        this.encounterId = encounterId;
+    public void setEncounter(Encounter encounter) {
+        this.encounter = encounter;
     }
 
     public Long getPatientId() {
@@ -75,20 +69,12 @@ public class PatientVitals {
         this.patientId = patientId;
     }
 
-    public String getVitalHeader() {
-        return vitalHeader;
+    public java.util.Map<String, Object> getPatientVitalData() {
+        return patientVitalData;
     }
 
-    public void setVitalHeader(String vitalHeader) {
-        this.vitalHeader = vitalHeader;
-    }
-
-    public String getVitalData() {
-        return vitalData;
-    }
-
-    public void setVitalData(String vitalData) {
-        this.vitalData = vitalData;
+    public void setPatientVitalData(java.util.Map<String, Object> patientVitalData) {
+        this.patientVitalData = patientVitalData;
     }
 
     public LocalDateTime getPatientVitalsCreatedOn() {
@@ -123,11 +109,4 @@ public class PatientVitals {
         this.patientVitalsModifiedBy = patientVitalsModifiedBy;
     }
 
-    public PatientVisitChart getPatientVisitChart() {
-        return patientVisitChart;
-    }
-
-    public void setPatientVisitChart(PatientVisitChart patientVisitChart) {
-        this.patientVisitChart = patientVisitChart;
-    }
 }

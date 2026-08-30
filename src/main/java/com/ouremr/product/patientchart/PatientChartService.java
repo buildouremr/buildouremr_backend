@@ -8,8 +8,8 @@ public interface PatientChartService {
     PatientVisitChartDTO getChartByAppointmentId(Long appointmentId);
     PatientVisitChartDTO saveChart(PatientVisitChartDTO chartDTO);
     List<PatientVisitChartDTO> getPatientChartHistory(Long patientId);
-    PatientVisitChartDTO getPatientSnapshot(Long patientId);
+    PatientVisitChartDTO getPatientSnapshot(Long patientId, Long encounterId);
     com.ouremr.product.dto.PatientProfileDTO getPatientProfile(Long patientId);
-    void autoSaveSection(Long encounterId, String section, com.ouremr.product.dto.PatientChartDTO dto, Long userId);
-    void saveVitals(Long encounterId, List<PatientVitalsDTO> vitals, Long userId);
+    com.ouremr.product.dto.PatientHeaderDTO getPatientHeader(Long patientId);
+    PatientVisitChartDTO getChartByEncounterId(Long patientId, Long encounterId);
 }

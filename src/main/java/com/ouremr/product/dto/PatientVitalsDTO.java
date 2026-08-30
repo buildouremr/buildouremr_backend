@@ -4,8 +4,7 @@ public class PatientVitalsDTO {
 
     private Long patientVitalsId;
     private Long patientVisitChartId;
-    private String vitalHeader;
-    private String vitalData;
+    private java.util.Map<String, Object> patientVitalData;
 
     public Long getPatientVitalsId() {
         return patientVitalsId;
@@ -23,19 +22,11 @@ public class PatientVitalsDTO {
         this.patientVisitChartId = patientVisitChartId;
     }
 
-    public String getVitalHeader() {
-        return vitalHeader;
+    public java.util.Map<String, Object> getPatientVitalData() {
+        return patientVitalData;
     }
 
-    public void setVitalHeader(String vitalHeader) {
-        this.vitalHeader = vitalHeader;
-    }
-
-    public String getVitalData() {
-        return vitalData;
-    }
-
-    public void setVitalData(String vitalData) {
-        this.vitalData = vitalData;
+    public void setPatientVitalData(java.util.Map<String, Object> patientVitalData) {
+        this.patientVitalData = patientVitalData;
     }
 }

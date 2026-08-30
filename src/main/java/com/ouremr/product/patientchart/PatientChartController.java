@@ -43,9 +43,9 @@ public class PatientChartController {
     }
 
     @GetMapping("/{patientId}/snapshot")
-    public ResponseEntity<?> getPatientSnapshot(@PathVariable Long patientId) {
+    public ResponseEntity<?> getPatientSnapshot(@PathVariable Long patientId, @RequestParam(required = false) Long encounterId) {
         try {
-            PatientVisitChartDTO snapshot = patientChartService.getPatientSnapshot(patientId);
+            PatientVisitChartDTO snapshot = patientChartService.getPatientSnapshot(patientId, encounterId);
             return new ResponseEntity<>(snapshot, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error fetching snapshot: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -65,9 +65,23 @@ public class PatientChartController {
         }
     }
 
+    @GetMapping("/{patientId}/header")
+    public ResponseEntity<?> getPatientHeader(@PathVariable Long patientId) {
+        try {
+            com.ouremr.product.dto.PatientHeaderDTO header = patientChartService.getPatientHeader(patientId);
+            if (header != null) {
+                return new ResponseEntity<>(header, HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Patient not found", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error fetching header: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<?> saveChart(@RequestBody PatientVisitChartDTO chartDTO) {
         try {
+            System.out.println("Payload: " + chartDTO.getReasonForVisit());
             PatientVisitChartDTO savedChart = patientChartService.saveChart(chartDTO);
             return new ResponseEntity<>(savedChart, HttpStatus.OK);
         } catch (Exception e) {
@@ -85,26 +99,13 @@ public class PatientChartController {
         }
     }
 
-    @PatchMapping("/encounter/{encounterId}/section/{sectionName}")
-    public ResponseEntity<?> autoSaveSection(
-            @PathVariable Long encounterId, 
-            @PathVariable String sectionName, 
-            @RequestBody PatientChartDTO dto) {
+    @GetMapping("/encounter/{encounterId}")
+    public ResponseEntity<?> getChartByEncounterId(@PathVariable Long encounterId, @RequestParam Long patientId) {
         try {
-            patientChartService.autoSaveSection(encounterId, sectionName, dto, 1L); // Hardcoded userId for now, similar to existing methods
-            return new ResponseEntity<>("Saved", HttpStatus.OK);
+            PatientVisitChartDTO chart = patientChartService.getChartByEncounterId(patientId, encounterId);
+            return new ResponseEntity<>(chart, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error saving section: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PatchMapping("/encounter/{encounterId}/vitals")
-    public ResponseEntity<?> saveVitals(@PathVariable Long encounterId, @RequestBody List<PatientVitalsDTO> vitals) {
-        try {
-            patientChartService.saveVitals(encounterId, vitals, 1L);
-            return ResponseEntity.ok(Map.of("status", "SUCCESS"));
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error saving vitals: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error fetching chart: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

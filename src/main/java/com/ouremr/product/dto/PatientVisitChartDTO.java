@@ -7,6 +7,7 @@ public class PatientVisitChartDTO {
     private Long patientVisitChartId;
     private Long patientId;
     private Long appointmentId;
+    private Long encounterId;
 
     // Demographics and Info pulled from PatientRegistration
     private String patientName;
@@ -24,16 +25,17 @@ public class PatientVisitChartDTO {
 
     // Chart Details
     private String reasonForVisit;
-    private String symptoms;
-    private String examination;
+    private List<String> symptoms;
+    private List<String> examination;
     private String diagnosisTests;
-    private String diagnosisNotes;
-    private String treatmentPlan;
-    private String advice;
+    private List<String> assessments;
+    private List<String> treatmentPlan;
+    private List<String> advice;
     private String status;
 
     private List<PatientVitalsDTO> vitals;
     private List<PatientPrescriptionDTO> prescriptions;
+    private String enteredBy;
 
     public Long getPatientVisitChartId() {
         return patientVisitChartId;
@@ -163,19 +165,19 @@ public class PatientVisitChartDTO {
         this.reasonForVisit = reasonForVisit;
     }
 
-    public String getSymptoms() {
+    public List<String> getSymptoms() {
         return symptoms;
     }
 
-    public void setSymptoms(String symptoms) {
+    public void setSymptoms(List<String> symptoms) {
         this.symptoms = symptoms;
     }
 
-    public String getExamination() {
+    public List<String> getExamination() {
         return examination;
     }
 
-    public void setExamination(String examination) {
+    public void setExamination(List<String> examination) {
         this.examination = examination;
     }
 
@@ -187,27 +189,27 @@ public class PatientVisitChartDTO {
         this.diagnosisTests = diagnosisTests;
     }
 
-    public String getDiagnosisNotes() {
-        return diagnosisNotes;
+    public List<String> getAssessments() {
+        return assessments;
     }
 
-    public void setDiagnosisNotes(String diagnosisNotes) {
-        this.diagnosisNotes = diagnosisNotes;
+    public void setAssessments(List<String> assessments) {
+        this.assessments = assessments;
     }
 
-    public String getTreatmentPlan() {
+    public List<String> getTreatmentPlan() {
         return treatmentPlan;
     }
 
-    public void setTreatmentPlan(String treatmentPlan) {
+    public void setTreatmentPlan(List<String> treatmentPlan) {
         this.treatmentPlan = treatmentPlan;
     }
 
-    public String getAdvice() {
+    public List<String> getAdvice() {
         return advice;
     }
 
-    public void setAdvice(String advice) {
+    public void setAdvice(List<String> advice) {
         this.advice = advice;
     }
 
@@ -233,5 +235,21 @@ public class PatientVisitChartDTO {
 
     public void setPrescriptions(List<PatientPrescriptionDTO> prescriptions) {
         this.prescriptions = prescriptions;
+    }
+
+    public Long getEncounterId() {
+        return encounterId;
+    }
+
+    public void setEncounterId(Long encounterId) {
+        this.encounterId = encounterId;
+    }
+
+    public String getEnteredBy() {
+        return enteredBy;
+    }
+
+    public void setEnteredBy(String enteredBy) {
+        this.enteredBy = enteredBy;
     }
 }
