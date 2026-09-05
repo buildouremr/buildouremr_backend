@@ -108,4 +108,24 @@ public class PatientChartController {
             return new ResponseEntity<>("Error fetching chart: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/patient/{patientId}/allergies")
+    public ResponseEntity<?> savePatientAllergies(@PathVariable Long patientId, @RequestBody Map<String, Object> allergiesData) {
+        try {
+            patientChartService.savePatientAllergies(patientId, allergiesData);
+            return new ResponseEntity<>("Allergies saved successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error saving allergies: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/patient/{patientId}/chronic-conditions")
+    public ResponseEntity<?> savePatientChronicConditions(@PathVariable Long patientId, @RequestBody Map<String, Object> chronicConditionsData) {
+        try {
+            patientChartService.savePatientChronicConditions(patientId, chronicConditionsData);
+            return new ResponseEntity<>("Chronic conditions saved successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error saving chronic conditions: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

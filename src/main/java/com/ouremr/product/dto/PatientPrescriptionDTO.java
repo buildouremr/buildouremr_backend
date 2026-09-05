@@ -8,7 +8,7 @@ public class PatientPrescriptionDTO {
     private String drugName;
     private String frequency;
     private String duration;
-    private String instruction;
+    private String route;
 
     public Long getPatientPrescriptionId() {
         return patientPrescriptionId;
@@ -57,6 +57,16 @@ public class PatientPrescriptionDTO {
     public void setDuration(String duration) {
         this.duration = duration;
     }
+
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
+    }
+
+    private String instruction;
 
     public String getInstruction() {
         return instruction;

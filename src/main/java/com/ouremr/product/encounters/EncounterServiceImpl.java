@@ -53,7 +53,7 @@ public class EncounterServiceImpl implements EncounterService {
 
     @Override
     @Transactional
-    public EncounterResponseDTO signEncounter(Long encounterId, Long userId) {
+    public EncounterResponseDTO signEncounter(Long encounterId, Long userId, String noteName) {
         if (encounterId == null) {
             throw new IllegalArgumentException("Encounter ID is required");
         }
@@ -66,7 +66,12 @@ public class EncounterServiceImpl implements EncounterService {
             return mapToResponseDTO(encounter);
         }
 
+        if (noteName != null && !noteName.trim().isEmpty()) {
+            encounter.setEncounterNoteName(noteName.trim());
+        }
+        
         encounter.setEncounterIsCompleted(true);
+        encounter.setEncounterIsCheckout(true);
         encounter.setEncounterSignedBy(userId);
         encounter.setEncounterCompletedOn(new Date());
         encounter.setEncounterModifiedBy(userId);

@@ -33,6 +33,8 @@ public class PatientHeaderDTO {
     private String allergies;
     private String chronicConditions;
     private String riskFactors;
+    private java.util.Map<String, Object> allergiesData;
+    private java.util.Map<String, Object> chronicConditionsData;
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -75,4 +77,19 @@ public class PatientHeaderDTO {
     
     public String getRiskFactors() { return riskFactors; }
     public void setRiskFactors(String riskFactors) { this.riskFactors = riskFactors; }
+
+    public java.util.Map<String, Object> getAllergiesData() { return allergiesData; }
+    public void setAllergiesData(java.util.Map<String, Object> allergiesData) { this.allergiesData = allergiesData; }
+
+    public java.util.Map<String, Object> getChronicConditionsData() { return chronicConditionsData; }
+    public void setChronicConditionsData(java.util.Map<String, Object> chronicConditionsData) { this.chronicConditionsData = chronicConditionsData; }
+    
+    private String id;
+    private String status;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

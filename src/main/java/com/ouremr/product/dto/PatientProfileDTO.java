@@ -129,17 +129,27 @@ public class PatientProfileDTO {
         public void setAllergies(List<AllergyItem> allergies) { this.allergies = allergies; }
     }
 
-    public static class ClinicalJourney {
-        private JourneyMetric consultations;
-        private JourneyMetric treatmentChanges;
-        private JourneyMetric importantEvents;
+    public static class JourneyItem {
+        private String date;
+        private String type;
+        private String provider;
+        private Boolean isCompleted;
+        
+        public String getDate() { return date; }
+        public void setDate(String date) { this.date = date; }
+        public String getType() { return type; }
+        public void setType(String type) { this.type = type; }
+        public String getProvider() { return provider; }
+        public void setProvider(String provider) { this.provider = provider; }
+        public Boolean getIsCompleted() { return isCompleted; }
+        public void setIsCompleted(Boolean isCompleted) { this.isCompleted = isCompleted; }
+    }
 
-        public JourneyMetric getConsultations() { return consultations; }
-        public void setConsultations(JourneyMetric consultations) { this.consultations = consultations; }
-        public JourneyMetric getTreatmentChanges() { return treatmentChanges; }
-        public void setTreatmentChanges(JourneyMetric treatmentChanges) { this.treatmentChanges = treatmentChanges; }
-        public JourneyMetric getImportantEvents() { return importantEvents; }
-        public void setImportantEvents(JourneyMetric importantEvents) { this.importantEvents = importantEvents; }
+    public static class ClinicalJourney {
+        private List<JourneyItem> items;
+        
+        public List<JourneyItem> getItems() { return items; }
+        public void setItems(List<JourneyItem> items) { this.items = items; }
     }
 
     public static class ConditionItem {
@@ -147,6 +157,7 @@ public class PatientProfileDTO {
         private String status;
         private String since;
         private String notes;
+        private String period;
         
         // getters & setters
         public String getCondition() { return condition; }
@@ -157,6 +168,8 @@ public class PatientProfileDTO {
         public void setSince(String since) { this.since = since; }
         public String getNotes() { return notes; }
         public void setNotes(String notes) { this.notes = notes; }
+        public String getPeriod() { return period; }
+        public void setPeriod(String period) { this.period = period; }
     }
 
     public static class MedicationItem {
@@ -166,7 +179,9 @@ public class PatientProfileDTO {
         private String route;
         private String duration;
         private String startDate;
+        private String endDate;
         private String prescriber;
+        private Boolean status;
         
         // getters & setters
         public String getName() { return name; }
@@ -181,8 +196,12 @@ public class PatientProfileDTO {
         public void setDuration(String duration) { this.duration = duration; }
         public String getStartDate() { return startDate; }
         public void setStartDate(String startDate) { this.startDate = startDate; }
+        public String getEndDate() { return endDate; }
+        public void setEndDate(String endDate) { this.endDate = endDate; }
         public String getPrescriber() { return prescriber; }
         public void setPrescriber(String prescriber) { this.prescriber = prescriber; }
+        public Boolean getStatus() { return status; }
+        public void setStatus(Boolean status) { this.status = status; }
     }
 
     public static class AllergyItem {

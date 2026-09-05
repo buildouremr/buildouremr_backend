@@ -34,6 +34,9 @@ public class PatientChartServiceImpl implements PatientChartService {
     
     @Autowired
     private EncounterRepository encounterRepository;
+    
+    @Autowired
+    private com.ouremr.product.repositories.UserLoginRepository userLoginRepository;
 
     @Autowired
     private SchedulerAppointmentRepository appointmentRepository;
@@ -61,6 +64,12 @@ public class PatientChartServiceImpl implements PatientChartService {
 
     @Autowired
     private PatientAdviceRepository patientAdviceRepository;
+
+    @Autowired
+    private PatientAllergiesRepository patientAllergiesRepository;
+
+    @Autowired
+    private PatientChronicConditionsRepository patientChronicConditionsRepository;
 
     @Override
     public PatientVisitChartDTO getChartByAppointmentId(Long appointmentId) {
@@ -353,7 +362,14 @@ public class PatientChartServiceImpl implements PatientChartService {
                 p.setPatientPrescriptionDrugName(pDto.getDrugName());
                 p.setPatientPrescriptionFrequency(pDto.getFrequency());
                 p.setPatientPrescriptionDuration(pDto.getDuration());
-                p.setPatientPrescriptionInstruction(pDto.getInstruction());
+                p.setPatientPrescriptionRoute(pDto.getRoute());
+                
+                String userId = dto.getEnteredBy() != null && !dto.getEnteredBy().trim().isEmpty() ? dto.getEnteredBy() : "1";
+                if (p.getPatientPrescriptionId() == null) {
+                    p.setPatientPrescriptionCreatedBy(userId);
+                } else {
+                    p.setPatientPrescriptionModifiedBy(userId);
+                }
                 
                 prescriptionRepository.save(p);
             }
@@ -567,11 +583,13 @@ public class PatientChartServiceImpl implements PatientChartService {
         if (pOpt.isPresent()) {
             PatientRegistration p = pOpt.get();
             header.setName(p.getPatientRegistrationFirstName() + " " + (p.getPatientRegistrationLastName() != null ? p.getPatientRegistrationLastName() : ""));
+            header.setId("PT-" + p.getPatientRegistrationId());
+            header.setStatus("Stable");
             header.setGender(p.getPatientRegistrationSex());
             if (p.getPatientRegistrationDob() != null) {
                 header.setDob(p.getPatientRegistrationDob().toString());
                 int age = Period.between(p.getPatientRegistrationDob(), java.time.LocalDate.now()).getYears();
-                header.setAge(String.valueOf(age));
+                header.setAge(age + " yrs");
             } else {
                 header.setDob("-");
                 header.setAge("-");
@@ -588,11 +606,47 @@ public class PatientChartServiceImpl implements PatientChartService {
             header.setBloodGroup(extractMetricDate(vitalData, "Blood Group"));
             
             header.setInsurance(p.getPatientRegistrationInsuranceName());
-            header.setAllergies(p.getPatientRegistrationAllergies());
-            header.setChronicConditions(p.getPatientRegistrationChronic());
+            
+            // Try fetching from PatientAllergies table first
+            List<PatientAllergies> paList = patientAllergiesRepository.findByPatientIdOrderByPatientAllergiesCreatedOnDesc(patientId);
+            if (paList != null && !paList.isEmpty()) {
+                java.util.Map<String, Object> aData = paList.get(0).getPatientAllergiesData();
+                header.setAllergiesData(aData);
+                // Maintain string representation for backward compatibility
+                if (aData != null && !aData.isEmpty()) {
+                    header.setAllergies(String.join(", ", aData.keySet()));
+                } else {
+                    header.setAllergies("");
+                }
+            } else {
+                header.setAllergies(p.getPatientRegistrationAllergies());
+            }
+
+            // Try fetching from PatientChronicConditions table first
+            Optional<PatientChronicConditions> pccOpt = patientChronicConditionsRepository.findFirstByPatientIdOrderByCreatedAtDesc(patientId);
+            if (pccOpt.isPresent()) {
+                java.util.Map<String, Object> cData = pccOpt.get().getPatientChronicConditionsData();
+                header.setChronicConditionsData(cData);
+                if (cData != null && !cData.isEmpty()) {
+                    header.setChronicConditions(String.join(", ", cData.keySet()));
+                } else {
+                    header.setChronicConditions("");
+                }
+            } else {
+                header.setChronicConditions(p.getPatientRegistrationChronic());
+            }
+
             header.setRiskFactors(p.getPatientRegistrationRiskFactors());
             
-            header.setLastVisit(null);
+            // Last Visit from encounters
+            Optional<Encounter> lastEncOpt = encounterRepository.findLatestByPatientId(patientId);
+            if (lastEncOpt.isPresent()) {
+                java.util.Date lastDate = lastEncOpt.get().getEncounterCreatedOn();
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd MMM yyyy");
+                header.setLastVisit(sdf.format(lastDate));
+            } else {
+                header.setLastVisit("-");
+            }
             header.setNextVisit(null);
             return header;
         }
@@ -607,6 +661,7 @@ public class PatientChartServiceImpl implements PatientChartService {
         if (!pOpt.isPresent()) return null;
         PatientRegistration p = pOpt.get();
         
+        // ─── HEADER ───────────────────────────────────────────────────────
         PatientProfileDTO.Header header = new PatientProfileDTO.Header();
         header.setName(p.getPatientRegistrationFirstName() + " " + (p.getPatientRegistrationLastName() != null ? p.getPatientRegistrationLastName() : ""));
         header.setId("PT-" + p.getPatientRegistrationId());
@@ -619,6 +674,7 @@ public class PatientChartServiceImpl implements PatientChartService {
             header.setDob("-");
             header.setAge("-");
         }
+        
         List<PatientVitals> latestVitalsList = vitalsRepository.findByPatientIdOrderByPatientVitalsCreatedOnDesc(patientId);
         java.util.Map<String, Object> vitalData = null;
         if (latestVitalsList != null && !latestVitalsList.isEmpty()) {
@@ -627,40 +683,82 @@ public class PatientChartServiceImpl implements PatientChartService {
         
         com.ouremr.product.dto.PatientHeaderDTO.MetricDate bg = extractMetricDate(vitalData, "Blood Group");
         header.setBloodGroup(new PatientProfileDTO.MetricDate(bg.getValue(), bg.getDate()));
-        
         com.ouremr.product.dto.PatientHeaderDTO.MetricDate h = extractMetricDate(vitalData, "Height");
         header.setHeight(new PatientProfileDTO.MetricDate(h.getValue(), h.getDate()));
-        
         com.ouremr.product.dto.PatientHeaderDTO.MetricDate w = extractMetricDate(vitalData, "Weight");
         header.setWeight(new PatientProfileDTO.MetricDate(w.getValue(), w.getDate()));
-        
         com.ouremr.product.dto.PatientHeaderDTO.MetricDate bmi = extractMetricDate(vitalData, "BMI");
         header.setBmi(new PatientProfileDTO.MetricDate(bmi.getValue(), bmi.getDate()));
         
-        header.setLastVisit("-");
+        // Last Visit from encounters
+        Optional<Encounter> lastEncOpt = encounterRepository.findLatestByPatientId(patientId);
+        if (lastEncOpt.isPresent()) {
+            java.util.Date lastDate = lastEncOpt.get().getEncounterCreatedOn();
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd MMM yyyy");
+            header.setLastVisit(sdf.format(lastDate));
+        } else {
+            header.setLastVisit("-");
+        }
         profile.setHeader(header);
         
+        // ─── ALERTS (Allergy & Condition Pills) ──────────────────────────
         PatientProfileDTO.Alerts alerts = new PatientProfileDTO.Alerts();
-        List<String> allergies = new ArrayList<>();
-        if (p.getPatientRegistrationAllergies() != null && !p.getPatientRegistrationAllergies().trim().isEmpty()) {
-            allergies.add("Allergy: " + p.getPatientRegistrationAllergies());
-        } else {
-            allergies.add("No Known Allergies");
-        }
-        alerts.setAllergies(allergies);
+        List<String> alertAllergies = new ArrayList<>();
+        List<String> alertConditions = new ArrayList<>();
         
-        List<String> conditions = new ArrayList<>();
-        if (p.getPatientRegistrationChronic() != null && !p.getPatientRegistrationChronic().trim().isEmpty()) {
-            conditions.add("Active Condition: " + p.getPatientRegistrationChronic());
+        // Read allergies from PatientAllergies table
+        List<PatientAllergies> paList = patientAllergiesRepository.findByPatientIdOrderByPatientAllergiesCreatedOnDesc(patientId);
+        java.util.Map<String, Object> allergiesData = null;
+        if (paList != null && !paList.isEmpty()) {
+            allergiesData = paList.get(0).getPatientAllergiesData();
         }
         
-        if (conditions.isEmpty()) {
-            conditions.add("No Active Conditions");
+        if (allergiesData != null && !allergiesData.isEmpty()) {
+            for (String allergyName : allergiesData.keySet()) {
+                alertAllergies.add("Allergy: " + allergyName);
+            }
+        } else if (p.getPatientRegistrationAllergies() != null && !p.getPatientRegistrationAllergies().trim().isEmpty()) {
+            for (String a : p.getPatientRegistrationAllergies().split(",")) {
+                if (a.trim().length() > 0) {
+                    alertAllergies.add("Allergy: " + a.trim());
+                }
+            }
+        }
+        alerts.setAllergies(alertAllergies);
+        
+        // Read chronic conditions from PatientChronicConditions table
+        Optional<PatientChronicConditions> pccOpt = patientChronicConditionsRepository.findFirstByPatientIdOrderByCreatedAtDesc(patientId);
+        java.util.Map<String, Object> chronicData = null;
+        if (pccOpt.isPresent()) {
+            chronicData = pccOpt.get().getPatientChronicConditionsData();
         }
         
-        alerts.setConditions(conditions);
+        if (chronicData != null && !chronicData.isEmpty()) {
+            for (java.util.Map.Entry<String, Object> entry : chronicData.entrySet()) {
+                String condName = entry.getKey();
+                String status = "Active";
+                if (entry.getValue() instanceof java.util.Map) {
+                    java.util.Map<?, ?> meta = (java.util.Map<?, ?>) entry.getValue();
+                    if (meta.containsKey("status") && meta.get("status") != null) {
+                        String s = meta.get("status").toString();
+                        if ("inactive".equalsIgnoreCase(s)) {
+                            continue; // Don't show inactive conditions in alert pills
+                        }
+                    }
+                }
+                alertConditions.add("Active Condition: " + condName);
+            }
+        } else if (p.getPatientRegistrationChronic() != null && !p.getPatientRegistrationChronic().trim().isEmpty()) {
+            for (String c : p.getPatientRegistrationChronic().split(",")) {
+                if (c.trim().length() > 0) {
+                    alertConditions.add("Active Condition: " + c.trim());
+                }
+            }
+        }
+        alerts.setConditions(alertConditions);
         profile.setAlerts(alerts);
         
+        // ─── VITALS ──────────────────────────────────────────────────────
         List<PatientProfileDTO.VitalItem> vitals = new ArrayList<>();
         if (latestVitalsList != null && !latestVitalsList.isEmpty()) {
             PatientVitals v = latestVitalsList.get(0);
@@ -694,36 +792,133 @@ public class PatientChartServiceImpl implements PatientChartService {
         } else {
             setEmptyVitals(vitals);
         }
-        
         profile.setVitals(vitals);
         
+        // ─── TABLES ──────────────────────────────────────────────────────
         PatientProfileDTO.Tables tables = new PatientProfileDTO.Tables();
         
+        // ── Conditions & Problems ─────────────────────────────────────
         List<PatientProfileDTO.ConditionItem> conditionItems = new ArrayList<>();
-        if (p.getPatientRegistrationChronic() != null && !p.getPatientRegistrationChronic().trim().isEmpty()) {
-            PatientProfileDTO.ConditionItem ci = new PatientProfileDTO.ConditionItem();
-            ci.setCondition(p.getPatientRegistrationChronic());
-            ci.setStatus("Active");
-            ci.setSince("-");
-            ci.setNotes("From Registration");
-            conditionItems.add(ci);
+        if (chronicData != null && !chronicData.isEmpty()) {
+            for (java.util.Map.Entry<String, Object> entry : chronicData.entrySet()) {
+                PatientProfileDTO.ConditionItem ci = new PatientProfileDTO.ConditionItem();
+                ci.setCondition(entry.getKey());
+                ci.setNotes("-");
+                
+                String condStatus = "Active";
+                String condDate = "-";
+                if (entry.getValue() instanceof java.util.Map) {
+                    java.util.Map<?, ?> meta = (java.util.Map<?, ?>) entry.getValue();
+                    if (meta.containsKey("date") && meta.get("date") != null) {
+                        condDate = meta.get("date").toString();
+                    }
+                    if (meta.containsKey("status") && meta.get("status") != null) {
+                        condStatus = meta.get("status").toString().substring(0, 1).toUpperCase() 
+                                   + meta.get("status").toString().substring(1).toLowerCase();
+                    }
+                }
+                ci.setStatus(condStatus);
+                ci.setSince(condDate);
+                conditionItems.add(ci);
+            }
+        } else if (p.getPatientRegistrationChronic() != null && !p.getPatientRegistrationChronic().trim().isEmpty()) {
+            for (String c : p.getPatientRegistrationChronic().split(",")) {
+                if (c.trim().length() > 0) {
+                    PatientProfileDTO.ConditionItem ci = new PatientProfileDTO.ConditionItem();
+                    ci.setCondition(c.trim());
+                    ci.setStatus("Active");
+                    ci.setSince("-");
+                    ci.setNotes("-");
+                    conditionItems.add(ci);
+                }
+            }
         }
-        
-        if (conditionItems.isEmpty()) {
-             PatientProfileDTO.ConditionItem ci = new PatientProfileDTO.ConditionItem();
-             ci.setCondition("No Known Conditions");
-             ci.setStatus("-");
-             ci.setSince("-");
-             ci.setNotes("-");
-             conditionItems.add(ci);
-        }
-        
         tables.setConditions(conditionItems);
         
-        tables.setMedications(new ArrayList<>());
+        // ── Medications ───────────────────────────────────────────────
+        List<PatientProfileDTO.MedicationItem> medicationItems = new ArrayList<>();
+        List<PatientPrescription> prescriptions = prescriptionRepository.findActiveByPatientId(patientId);
+        if (prescriptions != null) {
+            java.text.SimpleDateFormat dateFmt = new java.text.SimpleDateFormat("dd MMM yyyy");
+            for (PatientPrescription rx : prescriptions) {
+                PatientProfileDTO.MedicationItem mi = new PatientProfileDTO.MedicationItem();
+                mi.setName(rx.getPatientPrescriptionDrugName() != null ? rx.getPatientPrescriptionDrugName() : "-");
+                mi.setFrequency(rx.getPatientPrescriptionFrequency() != null ? rx.getPatientPrescriptionFrequency() : "-");
+                mi.setDuration(rx.getPatientPrescriptionDuration() != null ? rx.getPatientPrescriptionDuration() : "-");
+                mi.setStatus(rx.getIsActive());
+                
+                // Get route and type from joined Medication entity
+                if (rx.getMedication() != null) {
+                    mi.setRoute(rx.getPatientPrescriptionRoute() != null ? rx.getPatientPrescriptionRoute() : (rx.getMedication().getRoute() != null ? rx.getMedication().getRoute() : "-"));
+                    mi.setType(rx.getMedication().getForm() != null ? rx.getMedication().getForm() : "-");
+                } else {
+                    mi.setRoute(rx.getPatientPrescriptionRoute() != null ? rx.getPatientPrescriptionRoute() : "-");
+                    mi.setType("-");
+                }
+                
+                // Calculate start and end dates
+                if (rx.getPatientPrescriptionCreatedOn() != null) {
+                    java.time.LocalDateTime startLdt = rx.getPatientPrescriptionCreatedOn();
+                    java.util.Date startDateObj = java.util.Date.from(startLdt.atZone(java.time.ZoneId.systemDefault()).toInstant());
+                    mi.setStartDate(dateFmt.format(startDateObj));
+                    
+                    // Calculate end date from duration (e.g. "5 Days", "7 Days", "14 Days")
+                    int durationDays = parseDurationDays(rx.getPatientPrescriptionDuration());
+                    if (durationDays > 0) {
+                        java.time.LocalDateTime endLdt = startLdt.plusDays(durationDays);
+                        java.util.Date endDateObj = java.util.Date.from(endLdt.atZone(java.time.ZoneId.systemDefault()).toInstant());
+                        mi.setEndDate(dateFmt.format(endDateObj));
+                    } else {
+                        mi.setEndDate("-");
+                    }
+                } else {
+                    mi.setStartDate("-");
+                    mi.setEndDate("-");
+                }
+                
+                String prescriberName = "Unknown";
+                if (rx.getPatientPrescriptionCreatedBy() != null) {
+                    try {
+                        Long uid = Long.parseLong(rx.getPatientPrescriptionCreatedBy());
+                        java.util.Optional<com.ouremr.product.tables.UserLogin> uOpt = userLoginRepository.findById(uid);
+                        if (uOpt.isPresent()) {
+                            prescriberName = uOpt.get().getUserName();
+                        } else {
+                            prescriberName = rx.getPatientPrescriptionCreatedBy();
+                        }
+                    } catch (NumberFormatException e) {
+                        prescriberName = rx.getPatientPrescriptionCreatedBy();
+                    }
+                }
+                mi.setPrescriber(prescriberName);
+                medicationItems.add(mi);
+            }
+        }
+        tables.setMedications(medicationItems);
         
+        // ── Allergies & Risks ─────────────────────────────────────────
         List<PatientProfileDTO.AllergyItem> allergyItems = new ArrayList<>();
-        if (p.getPatientRegistrationAllergies() != null && !p.getPatientRegistrationAllergies().trim().isEmpty()) {
+        if (allergiesData != null && !allergiesData.isEmpty()) {
+            for (java.util.Map.Entry<String, Object> entry : allergiesData.entrySet()) {
+                PatientProfileDTO.AllergyItem ai = new PatientProfileDTO.AllergyItem();
+                ai.setAllergy(entry.getKey());
+                ai.setType("-");
+                ai.setSeverity("-");
+                ai.setReaction("-");
+                
+                if (entry.getValue() instanceof java.util.Map) {
+                    java.util.Map<?, ?> meta = (java.util.Map<?, ?>) entry.getValue();
+                    if (meta.containsKey("date") && meta.get("date") != null) {
+                        ai.setRecordedOn(meta.get("date").toString());
+                    } else {
+                        ai.setRecordedOn("-");
+                    }
+                } else {
+                    ai.setRecordedOn("-");
+                }
+                allergyItems.add(ai);
+            }
+        } else if (p.getPatientRegistrationAllergies() != null && !p.getPatientRegistrationAllergies().trim().isEmpty()) {
             PatientProfileDTO.AllergyItem ai = new PatientProfileDTO.AllergyItem();
             ai.setAllergy(p.getPatientRegistrationAllergies());
             ai.setType("-");
@@ -736,13 +931,55 @@ public class PatientChartServiceImpl implements PatientChartService {
         
         profile.setTables(tables);
         
+        // ─── CLINICAL JOURNEY ─────────────────────────────────────────
         PatientProfileDTO.ClinicalJourney journey = new PatientProfileDTO.ClinicalJourney();
-        journey.setConsultations(new PatientProfileDTO.JourneyMetric("-", "-"));
-        journey.setTreatmentChanges(new PatientProfileDTO.JourneyMetric("-", "0"));
-        journey.setImportantEvents(new PatientProfileDTO.JourneyMetric("-", "0"));
+        java.util.List<PatientProfileDTO.JourneyItem> journeyItems = new java.util.ArrayList<>();
+        java.util.List<com.ouremr.product.tables.Encounter> encounters = encounterRepository.findAllByPatientIdDesc(patientId);
+        
+        java.text.SimpleDateFormat journeyFmt = new java.text.SimpleDateFormat("dd MMM yyyy");
+        for (com.ouremr.product.tables.Encounter enc : encounters) {
+            PatientProfileDTO.JourneyItem ji = new PatientProfileDTO.JourneyItem();
+            ji.setDate(enc.getEncounterCreatedOn() != null ? journeyFmt.format(enc.getEncounterCreatedOn()) : "-");
+            
+            // Map the Note Name directly into Type dynamically
+            ji.setType((enc.getEncounterNoteName() != null && !enc.getEncounterNoteName().trim().isEmpty()) ? enc.getEncounterNoteName() : "Consultation");
+            
+            // Map provider name (encounterBy or createdBy)
+            String providerName = "Unknown";
+            Long providerId = enc.getEncounterBy() != null ? enc.getEncounterBy() : enc.getEncounterCreatedBy();
+            if (providerId != null) {
+                java.util.Optional<com.ouremr.product.tables.UserLogin> uOpt = userLoginRepository.findById(providerId);
+                if (uOpt.isPresent()) {
+                    providerName = uOpt.get().getUserName();
+                }
+            }
+            ji.setProvider(providerName);
+            
+            ji.setIsCompleted(enc.getEncounterIsCompleted() != null ? enc.getEncounterIsCompleted() : false);
+            journeyItems.add(ji);
+        }
+        
+        journey.setItems(journeyItems);
         profile.setClinicalJourney(journey);
         
         return profile;
+    }
+
+    /**
+     * Parse duration string like "5 Days", "7 days", "14 Days" to integer days.
+     * Returns 0 if parsing fails.
+     */
+    private int parseDurationDays(String duration) {
+        if (duration == null || duration.trim().isEmpty()) return 0;
+        try {
+            String numStr = duration.replaceAll("[^0-9]", "");
+            if (!numStr.isEmpty()) {
+                return Integer.parseInt(numStr);
+            }
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+        return 0;
     }
 
     private void setEmptyVitals(List<PatientProfileDTO.VitalItem> vitals) {
@@ -765,4 +1002,25 @@ public class PatientChartServiceImpl implements PatientChartService {
         dto.setPatientBloodGroup(extractMetricDate(vitalData, "Blood Group").getValue());
     }
 
+    @Override
+    @Transactional
+    public void savePatientAllergies(Long patientId, java.util.Map<String, Object> allergiesData) {
+        PatientAllergies pa = new PatientAllergies();
+        pa.setPatientId(patientId);
+        pa.setPatientAllergiesData(allergiesData);
+        pa.setPatientAllergiesCreatedOn(LocalDateTime.now());
+        pa.setPatientAllergiesCreatedBy("1");
+        patientAllergiesRepository.save(pa);
+    }
+
+    @Override
+    @Transactional
+    public void savePatientChronicConditions(Long patientId, java.util.Map<String, Object> chronicConditionsData) {
+        try {
+            PatientChronicConditions pcc = new PatientChronicConditions(patientId, chronicConditionsData);
+            patientChronicConditionsRepository.save(pcc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

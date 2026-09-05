@@ -46,6 +46,9 @@ public class PatientPrescription {
     @Column(name = "patient_prescription_modified_by")
     private String patientPrescriptionModifiedBy;
 
+    @Column(name = "patient_prescription_route")
+    private String patientPrescriptionRoute;
+
     @Column(name = "is_active", insertable = false)
     private Boolean isActive = true;
 
@@ -166,5 +169,13 @@ public class PatientPrescription {
 
     public void setMedication(Medication medication) {
         this.medication = medication;
+    }
+
+    public String getPatientPrescriptionRoute() {
+        return patientPrescriptionRoute;
+    }
+
+    public void setPatientPrescriptionRoute(String patientPrescriptionRoute) {
+        this.patientPrescriptionRoute = patientPrescriptionRoute;
     }
 }

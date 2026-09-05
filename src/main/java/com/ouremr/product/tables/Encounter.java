@@ -57,6 +57,9 @@ public class Encounter {
     @Column(name = "encounter_completed_on")
     private Date encounterCompletedOn;
 
+    @Column(name = "encounter_note_name")
+    private String encounterNoteName;
+
     public Long getEncounterId() {
         return encounterId;
     }
@@ -167,5 +170,13 @@ public class Encounter {
 
     public void setEncounterCompletedOn(Date encounterCompletedOn) {
         this.encounterCompletedOn = encounterCompletedOn;
+    }
+
+    public String getEncounterNoteName() {
+        return encounterNoteName;
+    }
+
+    public void setEncounterNoteName(String encounterNoteName) {
+        this.encounterNoteName = encounterNoteName;
     }
 }

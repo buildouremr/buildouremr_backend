@@ -4,5 +4,5 @@ import com.ouremr.product.dto.EncounterResponseDTO;
 
 public interface EncounterService {
     EncounterResponseDTO startOrGetActiveEncounter(Long patientId, Long userId);
-    EncounterResponseDTO signEncounter(Long encounterId, Long userId);
+    EncounterResponseDTO signEncounter(Long encounterId, Long userId, String noteName);
 }

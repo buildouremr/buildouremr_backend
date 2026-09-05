@@ -66,6 +66,7 @@ public class EncounterController {
     @PostMapping("/{encounterId}/sign")
     public ResponseEntity<EMRResponseBean> signEncounter(
             @PathVariable Long encounterId,
+            @RequestParam(required = false) String noteName,
             HttpServletRequest httpRequest) {
         
         EMRResponseBean response = new EMRResponseBean();
@@ -77,7 +78,7 @@ public class EncounterController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
             
-            EncounterResponseDTO data = encounterService.signEncounter(encounterId, userId);
+            EncounterResponseDTO data = encounterService.signEncounter(encounterId, userId, noteName);
             response.setData(data);
             response.setStatus("SUCCESS");
             return ResponseEntity.ok(response);
