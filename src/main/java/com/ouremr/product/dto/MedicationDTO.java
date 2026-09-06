@@ -1,7 +1,5 @@
 package com.ouremr.product.dto;
 
-import java.time.LocalDateTime;
-
 public class MedicationDTO {
     private Long id;
     private String name;

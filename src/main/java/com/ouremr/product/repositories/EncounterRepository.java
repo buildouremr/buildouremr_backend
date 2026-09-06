@@ -21,6 +21,9 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
     @Query("SELECT COUNT(e) FROM Encounter e WHERE e.patient.patientRegistrationId = :patientId")
     Long countByPatientId(@Param("patientId") Long patientId);
 
+    @Query("SELECT e FROM Encounter e WHERE e.patient.patientRegistrationId = :patientId AND e.encounterIsCompleted = false ORDER BY e.encounterCreatedOn DESC LIMIT 1")
+    Optional<Encounter> findActiveUnsignedByPatientId(@Param("patientId") Long patientId);
+
     @Query("SELECT e FROM Encounter e WHERE e.patient.patientRegistrationId = :patientId ORDER BY e.encounterCreatedOn DESC LIMIT 1")
     Optional<Encounter> findLatestByPatientId(@Param("patientId") Long patientId);
 

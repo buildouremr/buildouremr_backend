@@ -654,6 +654,7 @@ public class PatientChartServiceImpl implements PatientChartService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PatientProfileDTO getPatientProfile(Long patientId) {
         PatientProfileDTO profile = new PatientProfileDTO();
         
@@ -961,6 +962,48 @@ public class PatientChartServiceImpl implements PatientChartService {
         
         journey.setItems(journeyItems);
         profile.setClinicalJourney(journey);
+        
+        // ─── UNSIGNED CHART INFO ──────────────────────────────────────
+        Optional<com.ouremr.product.tables.Encounter> activeEncOpt = encounterRepository.findActiveUnsignedByPatientId(patientId);
+        PatientProfileDTO.UnsignedChartInfo unsignedInfo = new PatientProfileDTO.UnsignedChartInfo();
+        if (activeEncOpt.isPresent()) {
+            com.ouremr.product.tables.Encounter enc = activeEncOpt.get();
+            unsignedInfo.setEncounterId(enc.getEncounterId());
+            unsignedInfo.setHasUnsignedChart(true);
+            
+            java.util.Date encDate = enc.getEncounterModifiedOn() != null ? enc.getEncounterModifiedOn() : enc.getEncounterCreatedOn();
+            if (encDate != null) {
+                java.text.SimpleDateFormat fullFmt = new java.text.SimpleDateFormat("dd MMMM yyyy, HH:mm");
+                java.text.SimpleDateFormat ampmFmt = new java.text.SimpleDateFormat("dd MMMM yyyy, hh:mm a");
+                
+                long daysAgo = java.time.temporal.ChronoUnit.DAYS.between(
+                    encDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(), 
+                    java.time.LocalDate.now()
+                );
+                String daysAgoStr = daysAgo == 0 ? "today" : (daysAgo + " days ago");
+                
+                unsignedInfo.setDaysAgo(daysAgoStr);
+                unsignedInfo.setFormattedDate(ampmFmt.format(encDate));
+                unsignedInfo.setLastUpdated(fullFmt.format(encDate) + " (" + daysAgoStr + ")");
+            } else {
+                unsignedInfo.setLastUpdated("-");
+                unsignedInfo.setFormattedDate("-");
+                unsignedInfo.setDaysAgo("-");
+            }
+            
+            String providerName = "Dr. Ashok";
+            Long pId = enc.getEncounterBy() != null ? enc.getEncounterBy() : enc.getEncounterCreatedBy();
+            if (pId != null) {
+                Optional<com.ouremr.product.tables.UserLogin> uOpt = userLoginRepository.findById(pId);
+                if (uOpt.isPresent()) {
+                    providerName = uOpt.get().getUserName();
+                }
+            }
+            unsignedInfo.setProviderName(providerName);
+        } else {
+            unsignedInfo.setHasUnsignedChart(false);
+        }
+        profile.setUnsignedChart(unsignedInfo);
         
         return profile;
     }

@@ -1,7 +1,6 @@
 package com.ouremr.product.dto;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 public class AppointmentDTO {
 

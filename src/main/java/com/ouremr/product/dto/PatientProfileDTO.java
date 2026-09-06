@@ -8,6 +8,7 @@ public class PatientProfileDTO {
     private List<VitalItem> vitals;
     private Tables tables;
     private ClinicalJourney clinicalJourney;
+    private UnsignedChartInfo unsignedChart;
 
     public Header getHeader() { return header; }
     public void setHeader(Header header) { this.header = header; }
@@ -19,6 +20,8 @@ public class PatientProfileDTO {
     public void setTables(Tables tables) { this.tables = tables; }
     public ClinicalJourney getClinicalJourney() { return clinicalJourney; }
     public void setClinicalJourney(ClinicalJourney clinicalJourney) { this.clinicalJourney = clinicalJourney; }
+    public UnsignedChartInfo getUnsignedChart() { return unsignedChart; }
+    public void setUnsignedChart(UnsignedChartInfo unsignedChart) { this.unsignedChart = unsignedChart; }
 
     public static class MetricDate {
         private String value;
@@ -222,5 +225,29 @@ public class PatientProfileDTO {
         public void setReaction(String reaction) { this.reaction = reaction; }
         public String getRecordedOn() { return recordedOn; }
         public void setRecordedOn(String recordedOn) { this.recordedOn = recordedOn; }
+    }
+
+    public static class UnsignedChartInfo {
+        private Long encounterId;
+        private Boolean hasUnsignedChart;
+        private String lastUpdated;
+        private String formattedDate;
+        private String daysAgo;
+        private String providerName;
+
+        public UnsignedChartInfo() {}
+
+        public Long getEncounterId() { return encounterId; }
+        public void setEncounterId(Long encounterId) { this.encounterId = encounterId; }
+        public Boolean getHasUnsignedChart() { return hasUnsignedChart; }
+        public void setHasUnsignedChart(Boolean hasUnsignedChart) { this.hasUnsignedChart = hasUnsignedChart; }
+        public String getLastUpdated() { return lastUpdated; }
+        public void setLastUpdated(String lastUpdated) { this.lastUpdated = lastUpdated; }
+        public String getFormattedDate() { return formattedDate; }
+        public void setFormattedDate(String formattedDate) { this.formattedDate = formattedDate; }
+        public String getDaysAgo() { return daysAgo; }
+        public void setDaysAgo(String daysAgo) { this.daysAgo = daysAgo; }
+        public String getProviderName() { return providerName; }
+        public void setProviderName(String providerName) { this.providerName = providerName; }
     }
 }
